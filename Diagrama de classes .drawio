@@ -1,0 +1,246 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="classes" name="Classes">
+    <mxGraphModel dx="1406" dy="733" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cUsuario" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&quot;margin:0;margin-top:6px;text-align:center;&quot;&gt;«abstract»&lt;br&gt;&lt;b&gt;&lt;i&gt;Usuario&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0 0 0 8px;&quot;&gt;- id: int&lt;br&gt;- nome: String&lt;br&gt;- email: String&lt;br&gt;- senhaHash: String&lt;br&gt;- telefone: String&lt;br&gt;- ativo: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0 0 0 8px;&quot;&gt;+ login(email, senha): boolean&lt;br&gt;+ logout(): void&lt;br&gt;+ alterarSenha(nova: String): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="216" width="300" x="560" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cMedico" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Medico&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- crm: String&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ gerenciarDisponibilidade(): void&lt;br/&gt;+ informarAtraso(min: int): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="104" width="280" x="60" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="cRecep" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Recepcionista&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ confirmarPresenca(c: Consulta): void&lt;br/&gt;+ gerenciarFila(): void&lt;br/&gt;+ gerenciarListaEspera(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="104" width="300" x="560" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="cPaciente" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Paciente&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- cpf: String&lt;br/&gt;- dataNascimento: Date&lt;br/&gt;- numeroCarteirinha: String [0..1]&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ editarDados(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="280" x="1080" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="cLista" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;ListaEspera&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- especialidade: Especialidade&lt;br/&gt;- dataSolicitacao: DateTime&lt;br/&gt;- prioridade: int&lt;br/&gt;- ativo: boolean&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ notificarVaga(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="152" width="250" x="1420" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="cAdmin" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Administrador&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ gerenciarUsuarios(): void&lt;br/&gt;+ gerenciarPermissoes(): void&lt;br/&gt;+ gerenciarBoletos(): void&lt;br/&gt;+ gerarRelatorio(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="300" x="560" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="cEspec" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Especialidade&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- nome: String&lt;/p&gt;" vertex="1">
+          <mxGeometry height="88" width="160" x="20" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="cDisp" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Disponibilidade&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- diaSemana: int&lt;br/&gt;- horaInicio: Time&lt;br/&gt;- horaFim: Time&lt;br/&gt;- duracaoMin: int&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ gerarHorarios(): List&amp;lt;DateTime&amp;gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="136" width="250" x="200" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="cPront" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Prontuario&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- alergias: String&lt;br/&gt;- observacoes: String&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ adicionarAnotacao(texto: String): void&lt;br/&gt;+ consultarHistorico(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="136" width="280" x="1080" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="cDoc" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;DocumentoMedico&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- tipo: RECEITA | ATESTADO&lt;br/&gt;- conteudo: String&lt;br/&gt;- dataEmissao: Date&lt;br/&gt;- dataRetirada: Date [0..1]&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ emitir(): void&lt;br/&gt;+ registrarRetirada(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="168" width="260" x="1420" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="cConsulta" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Consulta&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- dataHora: DateTime&lt;br/&gt;- tipo: NORMAL | ENCAIXE | RETORNO&lt;br/&gt;- status: StatusConsulta&lt;br/&gt;- checkInEm: DateTime [0..1]&lt;br/&gt;- atrasoMin: int&lt;br/&gt;- anotacoes: String&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ reagendar(novaData: DateTime): void&lt;br/&gt;+ cancelar(motivo: String): void&lt;br/&gt;+ realizarCheckIn(): void&lt;br/&gt;+ iniciar(): void&lt;br/&gt;+ finalizar(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="248" width="300" x="560" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="cStatus" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;fillColor=#f5f5f5;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;«enumeration»&lt;br/&gt;&lt;b&gt;StatusConsulta&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;AGENDADA&lt;br/&gt;CONFIRMADA&lt;br/&gt;EM_ESPERA&lt;br/&gt;EM_ATENDIMENTO&lt;br/&gt;FINALIZADA&lt;br/&gt;CANCELADA&lt;br/&gt;FALTOU&lt;/p&gt;" vertex="1">
+          <mxGeometry height="184" width="220" x="200" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="cExame" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Exame&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- tipo: String&lt;br/&gt;- status: SOLICITADO | COLETADO | CONCLUIDO&lt;br/&gt;- dataSolicitacao: Date&lt;br/&gt;- dataResultado: Date [0..1]&lt;br/&gt;- arquivoResultado: String [0..1]&lt;br/&gt;- prazoRetornoDias: int [0..1]&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ atualizarStatus(s): void&lt;br/&gt;+ anexarResultado(arquivo): void&lt;br/&gt;+ dataLimiteRetorno(): Date&lt;/p&gt;" vertex="1">
+          <mxGeometry height="216" width="290" x="1080" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="cConvenio" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Convenio&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- nome: String&lt;br/&gt;- registroANS: String&lt;/p&gt;" vertex="1">
+          <mxGeometry height="104" width="200" x="1440" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="cBoleto" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;Boleto&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;- id: int&lt;br/&gt;- valor: Decimal&lt;br/&gt;- vencimento: Date&lt;br/&gt;- status: PENDENTE | PAGO | CANCELADO&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;+ gerar(): void&lt;br/&gt;+ darBaixa(): void&lt;br/&gt;+ cancelar(): void&lt;/p&gt;" vertex="1">
+          <mxGeometry height="168" width="260" x="1420" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="inh_cMedico" edge="1" parent="1" source="cMedico" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#000000;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="cUsuario" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inh_cRecep" edge="1" parent="1" source="cRecep" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#000000;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="cUsuario" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inh_cPaciente" edge="1" parent="1" source="cPaciente" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#000000;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="cUsuario" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inh_admin" edge="1" parent="1" source="cAdmin" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#000000;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="cRecep" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_med_cons" edge="1" parent="1" source="cMedico" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.32;" target="cConsulta" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="352" />
+              <mxPoint x="490" y="740" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_med_cons_l0" connectable="0" parent="a_med_cons" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.9" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_med_cons_l1" connectable="0" parent="a_med_cons" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.85" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_cons" edge="1" parent="1" source="cPaciente" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;entryX=1;entryY=0.16;" target="cConsulta" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="970" y="360" />
+              <mxPoint x="970" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_cons_l0" connectable="0" parent="a_pac_cons" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.9" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_cons_l1" connectable="0" parent="a_pac_cons" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.85" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_med_esp" edge="1" parent="1" source="cMedico" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.14;exitY=1;entryX=0.5;entryY=0;" target="cEspec" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_med_esp_l0" connectable="0" parent="a_med_esp" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_med_esp_l1" connectable="0" parent="a_med_esp" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_med_disp" edge="1" parent="1" source="cMedico" style="startArrow=diamondThin;startFill=1;startSize=14;endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.857;exitY=1;entryX=0.4;entryY=0;" target="cDisp" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_med_disp_l0" connectable="0" parent="c_med_disp" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_med_disp_l1" connectable="0" parent="c_med_disp" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pac_pront" edge="1" parent="1" source="cPaciente" style="startArrow=diamondThin;startFill=1;startSize=14;endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="cPront" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_pac_pront_l0" connectable="0" parent="c_pac_pront" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pac_pront_l1" connectable="0" parent="c_pac_pront" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pront_exame" edge="1" parent="1" source="cPront" style="startArrow=diamondThin;startFill=1;startSize=14;endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="cExame" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_pront_exame_l0" connectable="0" parent="c_pront_exame" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pront_exame_l1" connectable="0" parent="c_pront_exame" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pront_doc" edge="1" parent="1" source="cPront" style="startArrow=diamondThin;startFill=1;startSize=14;endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;entryX=0;entryY=0.4;" target="cDoc" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c_pront_doc_l0" connectable="0" parent="c_pront_doc" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_pront_doc_l1" connectable="0" parent="c_pront_doc" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_lista" edge="1" parent="1" source="cPaciente" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.25;entryX=0;entryY=0.2;" target="cLista" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_pac_lista_l0" connectable="0" parent="a_pac_lista" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_lista_l1" connectable="0" parent="a_pac_lista" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_conv" edge="1" parent="1" source="cPaciente" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" target="cConvenio" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1395" y="390" />
+              <mxPoint x="1395" y="812" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_conv_l0" connectable="0" parent="a_pac_conv" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="-0.9" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_pac_conv_l1" connectable="0" parent="a_pac_conv" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+          <mxGeometry relative="1" x="0.9" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_cons_exame" edge="1" parent="1" source="cConsulta" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;exitX=1;exitY=0.48;entryX=0;entryY=0.37;" target="cExame" value="solicita">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cons_exame_l0" connectable="0" parent="a_cons_exame" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.8" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_cons_exame_l1" connectable="0" parent="a_cons_exame" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="0.8" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_cons_bol" edge="1" parent="1" source="cConsulta" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" target="cBoleto" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="1160" />
+              <mxPoint x="1550" y="1160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_cons_bol_l0" connectable="0" parent="a_cons_bol" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.95" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_cons_bol_l1" connectable="0" parent="a_cons_bol" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+          <mxGeometry relative="1" x="0.95" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_bol_conv" edge="1" parent="1" source="cBoleto" style="endArrow=none;html=1;rounded=0;strokeColor=#000000;fontSize=11;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="cConvenio" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_bol_conv_l0" connectable="0" parent="a_bol_conv" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+          <mxGeometry relative="1" x="-0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_bol_conv_l1" connectable="0" parent="a_bol_conv" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+          <mxGeometry relative="1" x="0.6" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d_cons_status" edge="1" parent="1" source="cConsulta" style="endArrow=open;dashed=1;html=1;rounded=0;strokeColor=#000000;exitX=0;exitY=0.73;entryX=1;entryY=0.76;fontSize=11;" target="cStatus" value="«use»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
