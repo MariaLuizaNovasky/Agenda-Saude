@@ -1,0 +1,12 @@
+# Dependências e builds
+node_modules/
+dist/
+build/
+
+# Variáveis de ambiente e logs
+.env
+.env.local
+*.log
+
+# Ignorar totalmente a pasta do frontend para a sua dupla
+frontend/
