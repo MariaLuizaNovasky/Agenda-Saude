@@ -1,0 +1,117 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="database" name="Banco de Dados">
+    <mxGraphModel dx="1406" dy="733" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1150" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tEsp" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;ESPECIALIDADES&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;nome&lt;/p&gt;" vertex="1">
+          <mxGeometry height="80" width="280" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tLista" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;LISTA_ESPERA&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;paciente_id (FK)&lt;br/&gt;especialidade_id (FK)&lt;br/&gt;data_solicitacao&lt;br/&gt;prioridade&lt;br/&gt;ativo&lt;/p&gt;" vertex="1">
+          <mxGeometry height="144" width="280" x="360" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tUsu" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;USUARIOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;nome&lt;br/&gt;email (UNIQUE)&lt;br/&gt;senha_hash&lt;br/&gt;telefone&lt;br/&gt;tipo (PACIENTE | MEDICO | RECEPCIONISTA | ADMIN)&lt;br/&gt;ativo&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="280" x="680" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tLog" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;LOG_ALTERACOES&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;usuario_id (FK)&lt;br/&gt;entidade&lt;br/&gt;registro_id&lt;br/&gt;acao&lt;br/&gt;data_hora&lt;/p&gt;" vertex="1">
+          <mxGeometry height="144" width="280" x="1320" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tMedEsp" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;MEDICO_ESPECIALIDADE&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;medico_id (PK, FK)&lt;br/&gt;especialidade_id (PK, FK)&lt;/p&gt;" vertex="1">
+          <mxGeometry height="80" width="280" x="40" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="tMed" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;MEDICOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br/&gt;crm (UNIQUE)&lt;/p&gt;" vertex="1">
+          <mxGeometry height="80" width="280" x="360" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="tPac" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;PACIENTES&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br/&gt;cpf (UNIQUE)&lt;br/&gt;data_nascimento&lt;br/&gt;convenio_id (FK, NULL)&lt;br/&gt;numero_carteirinha&lt;/p&gt;" vertex="1">
+          <mxGeometry height="128" width="280" x="1000" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="tConv" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;CONVENIOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;nome&lt;br/&gt;registro_ans&lt;/p&gt;" vertex="1">
+          <mxGeometry height="96" width="280" x="1320" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="tDisp" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;DISPONIBILIDADES&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;medico_id (FK)&lt;br/&gt;dia_semana&lt;br/&gt;hora_inicio&lt;br/&gt;hora_fim&lt;br/&gt;duracao_min&lt;/p&gt;" vertex="1">
+          <mxGeometry height="144" width="280" x="360" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="tCons" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;CONSULTAS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;paciente_id (FK)&lt;br/&gt;medico_id (FK)&lt;br/&gt;data_hora&lt;br/&gt;tipo&lt;br/&gt;status&lt;br/&gt;check_in_em&lt;br/&gt;atraso_min&lt;br/&gt;anotacoes&lt;/p&gt;" vertex="1">
+          <mxGeometry height="192" width="280" x="680" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="tPront" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;PRONTUARIOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;paciente_id (FK, UNIQUE)&lt;br/&gt;alergias&lt;br/&gt;observacoes&lt;/p&gt;" vertex="1">
+          <mxGeometry height="112" width="280" x="1000" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="tDoc" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;DOCUMENTOS_MEDICOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;prontuario_id (FK)&lt;br/&gt;tipo (RECEITA | ATESTADO)&lt;br/&gt;conteudo&lt;br/&gt;data_emissao&lt;br/&gt;data_retirada&lt;/p&gt;" vertex="1">
+          <mxGeometry height="144" width="280" x="1320" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="tBol" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;BOLETOS&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;consulta_id (FK, UNIQUE)&lt;br/&gt;convenio_id (FK, NULL)&lt;br/&gt;valor&lt;br/&gt;vencimento&lt;br/&gt;status&lt;/p&gt;" vertex="1">
+          <mxGeometry height="144" width="280" x="680" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="tExa" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=fill;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" value="&lt;p style=&#39;margin:0;margin-top:6px;text-align:center;&#39;&gt;&lt;b&gt;EXAMES&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;/&gt;&lt;p style=&#39;margin:0 0 0 8px;&#39;&gt;id (PK)&lt;br/&gt;prontuario_id (FK)&lt;br/&gt;consulta_id (FK)&lt;br/&gt;tipo&lt;br/&gt;status&lt;br/&gt;data_solicitacao&lt;br/&gt;data_resultado&lt;br/&gt;arquivo_resultado&lt;br/&gt;prazo_retorno_dias&lt;/p&gt;" vertex="1">
+          <mxGeometry height="192" width="280" x="1000" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="dbnote" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;spacingLeft=6;" value="Recepcionistas e administradores nao tem colunas proprias: o perfil fica em USUARIOS.tipo." vertex="1">
+          <mxGeometry height="60" width="280" x="40" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="r_med_usu" edge="1" parent="1" source="tMed" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToOne;endArrow=ERmandOne;" target="tUsu" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_pac_usu" edge="1" parent="1" source="tPac" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToOne;endArrow=ERmandOne;" target="tUsu" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_log_usu" edge="1" parent="1" source="tLog" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tUsu" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_me_med" edge="1" parent="1" source="tMedEsp" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tMed" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_me_esp" edge="1" parent="1" source="tMedEsp" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tEsp" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_lista_esp" edge="1" parent="1" source="tLista" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tEsp" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_lista_pac" edge="1" parent="1" source="tLista" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="tPac" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="260" />
+              <mxPoint x="1140" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_pac_conv" edge="1" parent="1" source="tPac" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERzeroToOne;" target="tConv" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_disp_med" edge="1" parent="1" source="tDisp" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tMed" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_cons_med" edge="1" parent="1" source="tCons" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tMed" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_cons_pac" edge="1" parent="1" source="tCons" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tPac" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_pront_pac" edge="1" parent="1" source="tPront" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToOne;endArrow=ERmandOne;" target="tPac" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_doc_pront" edge="1" parent="1" source="tDoc" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tPront" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_exa_pront" edge="1" parent="1" source="tExa" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tPront" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_exa_cons" edge="1" parent="1" source="tExa" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERmandOne;" target="tCons" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_bol_cons" edge="1" parent="1" source="tBol" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToOne;endArrow=ERmandOne;" target="tCons" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_bol_conv" edge="1" parent="1" source="tBol" style="html=1;rounded=0;strokeColor=#666666;endFill=0;startFill=0;startSize=12;endSize=12;startArrow=ERzeroToMany;endArrow=ERzeroToOne;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" target="tConv" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="820" y="1060" />
+              <mxPoint x="1640" y="1060" />
+              <mxPoint x="1640" y="348" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
