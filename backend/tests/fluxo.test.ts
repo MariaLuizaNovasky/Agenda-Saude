@@ -138,6 +138,10 @@ describe('prontuário, receita e exame', () => {
     expect((await post(EMAILS.farmacia, `/api/documentos/${estado.receita}/retirada`)).status).toBe(200);
     const dup = await post(EMAILS.farmacia, `/api/documentos/${estado.receita}/retirada`);
     expect(dup.status).toBe(409);
+    const disponiveis = await get(EMAILS.farmacia, '/api/documentos');
+    expect(disponiveis.body.some((d: { id: number }) => d.id === estado.receita)).toBe(false);
+    const historico = await get(EMAILS.farmacia, `/api/documentos?busca=${estado.receita}`);
+    expect(historico.body.some((d: { id: number; data_retirada: string | null }) => d.id === estado.receita && d.data_retirada)).toBe(true);
   });
 
   it('farmácia não retira atestado', async () => {

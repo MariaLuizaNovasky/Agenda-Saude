@@ -1,31 +1,39 @@
 import { useState, type FormEvent } from 'react';
 import { api, type Documento } from '../api';
 import { ModalDocumento } from '../components/DocumentoMedico';
-import { Botao, Cabecalho, Tag, useAcao, Vazio } from '../components/ui';
+import { Botao, Cabecalho, Carregando, Tag, useAcao, Vazio } from '../components/ui';
 import { cpf, data, mascaraCpf } from '../formato';
+import { useCarregar } from '../hooks';
 
 // Farmácia (externo): registrar retirada de medicamento
 export function Receitas() {
   const [termo, setTermo] = useState('');
-  const [lista, setLista] = useState<Documento[] | null>(null);
   const [doc, setDoc] = useState<Documento | null>(null);
   const [executar, executando] = useAcao();
+  const { dados: lista, erro, carregando, setDados: setLista } = useCarregar(
+    () => api.get<Documento[]>('/documentos'),
+  );
 
   const buscar = async (e?: FormEvent) => {
     e?.preventDefault();
-    const r = await executar(() => api.get<Documento[]>(`/documentos?busca=${encodeURIComponent(termo)}`));
+    const busca = termo.replace(/\D/g, '');
+    const r = await executar(() => api.get<Documento[]>(busca ? `/documentos?busca=${encodeURIComponent(busca)}` : '/documentos'));
     if (r) setLista(r);
   };
 
   return (
     <>
-      <Cabecalho titulo="Retirada de receitas" descricao="Busque pelo CPF do paciente ou pelo número impresso na receita." />
+      <Cabecalho titulo="Retirada de receitas" descricao="Receitas disponíveis para retirada aparecem abaixo. Busque pelo CPF ou número para localizar receitas anteriores." />
       <form className="filtros" onSubmit={buscar}>
-        <input className="busca-larga" required inputMode="numeric" placeholder="CPF ou nº da receita" aria-label="CPF ou número da receita" value={termo.length > 6 ? mascaraCpf(termo) : termo} onChange={(e) => setTermo(e.target.value.replace(/\D/g, ''))} />
-        <Botao type="submit" carregando={executando}>Buscar</Botao>
+        <input className="busca-larga" inputMode="numeric" placeholder="CPF ou nº da receita" aria-label="CPF ou número da receita" value={termo.length > 6 ? mascaraCpf(termo) : termo} onChange={(e) => setTermo(e.target.value.replace(/\D/g, ''))} />
+        <Botao type="submit" carregando={executando}>{termo ? 'Buscar' : 'Mostrar disponíveis'}</Botao>
       </form>
-      {lista && (!lista.length ? (
-        <Vazio titulo="Nenhuma receita encontrada">Confira o CPF ou o número da receita.</Vazio>
+      {carregando ? <Carregando /> : erro ? (
+        <Vazio titulo="Não foi possível carregar as receitas">{erro}</Vazio>
+      ) : !lista?.length ? (
+        <Vazio titulo={termo ? 'Nenhuma receita encontrada' : 'Nenhuma receita aguardando retirada'}>
+          {termo ? 'Confira o CPF ou o número da receita.' : 'As receitas disponíveis para retirada aparecerão aqui.'}
+        </Vazio>
       ) : (
         <table className="tabela">
           <thead><tr><th>Nº</th><th>Paciente</th><th>Prescrição</th><th>Emitida</th><th>Situação</th><th /></tr></thead>
@@ -47,7 +55,7 @@ export function Receitas() {
             ))}
           </tbody>
         </table>
-      ))}
+      )}
       <ModalDocumento doc={doc} aoFechar={() => setDoc(null)} />
     </>
   );

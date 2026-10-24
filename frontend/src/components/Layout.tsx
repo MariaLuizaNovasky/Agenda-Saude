@@ -153,6 +153,7 @@ export function Layout() {
           <Notificacoes />
         </div>
         <TabManager
+          key={`${usuario.id}:${usuario.tipo}`}
           outlet={outlet}
           menus={MENU[usuario.tipo]}
           perfil={usuario.tipo}

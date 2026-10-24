@@ -1,9 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { api, type Convenio, type Usuario } from '../api';
+import { api, type Usuario } from '../api';
 import { useAuth, useUsuario } from '../auth';
 import { Botao, Cabecalho, Campo, useAcao, useToast } from '../components/ui';
-import { cpf, data, mascaraTelefone, PERFIL } from '../formato';
-import { useCarregar } from '../hooks';
+import { cpf, mascaraTelefone, PERFIL } from '../formato';
 import { FormSenha } from './TrocarSenha';
 
 // Usuario.alterarSenha() e Paciente.editarDados()
@@ -12,12 +11,18 @@ export function Perfil() {
   const { atualizar } = useAuth();
   const toast = useToast();
   const [executar, salvando] = useAcao();
-  const convenios = useCarregar(() => api.get<Convenio[]>('/convenios'));
-  const [f, setF] = useState({ nome: u.nome, telefone: u.telefone ?? '', convenio_id: u.convenio_id ?? null, numero_carteirinha: u.numero_carteirinha ?? '' });
+  const [f, setF] = useState({
+    nome: u.nome,
+    telefone: u.telefone ?? '',
+    data_nascimento: u.data_nascimento?.slice(0, 10) ?? '',
+  });
 
   const salvar = async (e: FormEvent) => {
     e.preventDefault();
-    const r = await executar(() => api.put<Usuario>('/auth/perfil', { ...f, numero_carteirinha: f.numero_carteirinha || null }), 'Dados salvos.');
+    const dados = u.tipo === 'PACIENTE'
+      ? f
+      : { nome: f.nome, telefone: f.telefone };
+    const r = await executar(() => api.put<Usuario>('/auth/perfil', dados), 'Dados salvos.');
     if (r) atualizar(r);
   };
 
@@ -36,22 +41,25 @@ export function Perfil() {
             </Campo>
             {u.tipo === 'PACIENTE' && (
               <>
-                <dl className="dados">
-                  <div><dt>CPF</dt><dd>{cpf(u.cpf)}</dd></div>
-                  <div><dt>Nascimento</dt><dd>{data(u.data_nascimento)}</dd></div>
-                </dl>
-                <Campo rotulo="Convênio">
-                  <select value={f.convenio_id ?? ''} onChange={(e) => setF({ ...f, convenio_id: e.target.value ? Number(e.target.value) : null })}>
-                    <option value="">Particular (sem convênio)</option>
-                    {convenios.dados?.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-                  </select>
+                <Campo rotulo="CPF">
+                  <input value={cpf(u.cpf)} disabled />
                 </Campo>
-                {f.convenio_id && (
-                  <Campo rotulo="Número da carteirinha">
-                    <input required value={f.numero_carteirinha} onChange={(e) => setF({ ...f, numero_carteirinha: e.target.value })} />
-                  </Campo>
-                )}
-                <p className="texto-suave">Para corrigir CPF ou data de nascimento, fale com a recepção.</p>
+                <Campo rotulo="Data de nascimento">
+                  <input
+                    type="date"
+                    required
+                    max={new Date().toISOString().slice(0, 10)}
+                    value={f.data_nascimento}
+                    onChange={(e) => setF({ ...f, data_nascimento: e.target.value })}
+                  />
+                </Campo>
+                <Campo rotulo="Convênio">
+                  <input value={u.convenio_nome ?? 'Particular (sem convênio)'} disabled />
+                </Campo>
+                <Campo rotulo="Número da carteirinha">
+                  <input value={u.numero_carteirinha ?? ''} placeholder="Não informado" disabled />
+                </Campo>
+                <p className="texto-suave">Para alterar CPF, convênio ou carteirinha, fale com a recepção.</p>
               </>
             )}
             {u.tipo === 'MEDICO' && (
