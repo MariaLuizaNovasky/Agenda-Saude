@@ -64,6 +64,10 @@ export function App() {
   if (usuario.troca_senha_obrigatoria) return <TrocarSenha obrigatoria />;
 
   const inicio = MENU[usuario.tipo][0].para;
+  if (['/entrar', '/cadastro', '/recuperar-senha'].includes(local.pathname)) {
+    return <Navigate to={inicio} replace />;
+  }
+
   return (
     <Routes>
       <Route element={<Layout />}>

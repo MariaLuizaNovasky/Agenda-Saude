@@ -1,0 +1,15 @@
+{
+  "name": "agenda-saude",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others --names API,WEB \"npm run dev --workspace agenda-saude-backend\" \"npm run dev --workspace agenda-saude-frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

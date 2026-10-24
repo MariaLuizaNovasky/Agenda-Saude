@@ -131,12 +131,15 @@ clinicoRouter.get('/documentos', permitir('FARMACIA', 'MEDICO', 'PACIENTE'), (re
   const f: string[] = [];
   const p: (string | number)[] = [];
   if (u.tipo === 'FARMACIA') {
-    // a farmácia só vê receitas, e só quando busca pelo CPF do paciente ou pelo número da receita
     f.push("d.tipo = 'RECEITA'");
     const dig = busca.replace(/\D/g, '');
-    if (!dig) return res.json([]);
-    f.push('(p.cpf = ? OR d.id = ?)');
-    p.push(dig, Number(dig));
+    if (busca && !dig) return res.json([]);
+    if (dig) {
+      f.push('(p.cpf = ? OR d.id = ?)');
+      p.push(dig, Number(dig));
+    } else {
+      f.push('d.data_retirada IS NULL');
+    }
   } else if (u.tipo === 'MEDICO') {
     f.push('d.medico_id = ?'); p.push(u.id);
   } else {
