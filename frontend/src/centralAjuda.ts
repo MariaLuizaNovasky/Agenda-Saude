@@ -5,7 +5,7 @@ export type NivelSolicitacao = 'RECEPCAO' | 'ADMIN';
 
 export interface MensagemSolicitacao {
   id: string;
-  autorId: number;
+  autorId: string;
   autorNome: string;
   perfil: Perfil;
   texto: string;
@@ -14,7 +14,7 @@ export interface MensagemSolicitacao {
 
 export interface SolicitacaoAjuda {
   id: string;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNome: string;
   assunto: string;
   categoria: string;

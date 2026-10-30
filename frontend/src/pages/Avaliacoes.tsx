@@ -19,7 +19,7 @@ interface RascunhoAvaliacao {
   comentario: string;
 }
 
-const chaveAvaliacoes = (pacienteId: number) => `agenda-saude:avaliacoes:${pacienteId}`;
+const chaveAvaliacoes = (pacienteId: string) => `agenda-saude:avaliacoes:${pacienteId}`;
 
 function ehAvaliacao(item: unknown): item is AvaliacaoConsulta {
   if (!item || typeof item !== 'object') return false;
@@ -33,7 +33,7 @@ function ehAvaliacao(item: unknown): item is AvaliacaoConsulta {
     && typeof avaliacao.criadaEm === 'string';
 }
 
-function lerAvaliacoes(pacienteId: number) {
+function lerAvaliacoes(pacienteId: string) {
   const bruto = localStorage.getItem(chaveAvaliacoes(pacienteId));
   if (!bruto) return [] as AvaliacaoConsulta[];
   const dados: unknown = JSON.parse(bruto);

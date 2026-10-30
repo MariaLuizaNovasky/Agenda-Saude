@@ -21,14 +21,14 @@ interface MensagemChat {
   texto: string;
   autor: string;
   perfil: PerfilInterno;
-  autorId?: number;
-  destinatarioId?: number;
+  autorId?: string;
+  destinatarioId?: string;
   crm?: string;
   criadoEm: string;
 }
 
 interface ContatoInterno {
-  id: number;
+  id: string;
   nome: string;
   perfil: PerfilInterno;
   crm?: string;
@@ -40,7 +40,7 @@ interface RegistroAuditoria {
   acao: AcaoAuditoria;
   descricao: string;
   usuario: string;
-  usuarioId?: number;
+  usuarioId?: string;
   perfil: PerfilInterno;
   crm?: string;
   especialidades?: string;
@@ -315,7 +315,7 @@ export function Comunicacao() {
         autor: usuario.nome,
         perfil: usuario.tipo as PerfilInterno,
         autorId: usuario.id,
-        ...(conversaId !== 'equipe' ? { destinatarioId: Number(conversaId) } : {}),
+        ...(conversaId !== 'equipe' ? { destinatarioId: conversaId } : {}),
         ...(usuario.tipo === 'MEDICO'
           ? { crm: usuario.crm ? `${usuario.crm}${usuario.crm_uf ? `/${usuario.crm_uf}` : ''}` : 'Não informado' }
           : {}),
@@ -369,7 +369,7 @@ export function Comunicacao() {
     item.autor !== usuario.nome &&
     !idsLidas.has(item.id),
   ).length;
-  const naoLidasContato = (contatoId: number) => {
+  const naoLidasContato = (contatoId: string) => {
     const lidas = new Set(estado.leituras[`${usuario.id}:${contatoId}`] ?? []);
     return estado.mensagens.filter((item) =>
       item.destinatarioId === usuario.id &&

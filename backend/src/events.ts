@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
-import { lerToken } from './auth.js';
+import jwt from 'jsonwebtoken';
+import { config } from './config.js';
 
 /**
  * Atualização em tempo real via Server-Sent Events.
@@ -10,7 +11,12 @@ const clientes = new Set<Response>();
 
 export function conectarEventos(req: Request, res: Response) {
   // EventSource não envia cabeçalhos, então o token vem na query string
-  lerToken(String(req.query.token ?? ''));
+  try {
+    jwt.verify(String(req.query.token ?? ''), config.jwtSecret);
+  } catch {
+    res.status(401).json({ erro: 'Token inválido ou expirado.' });
+    return;
+  }
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',

@@ -1,22 +1,20 @@
-import type { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { config } from './config.js';
-import { one } from './db.js';
-import { HttpError, proibido } from './util.js';
+import { supabase } from './supabase.js';
+import { HttpError } from './util.js';
 
 export type Perfil = 'PACIENTE' | 'MEDICO' | 'RECEPCIONISTA' | 'ADMIN' | 'FINANCEIRO' | 'LABORATORIO' | 'FARMACIA';
-export const PERFIS: Perfil[] = ['PACIENTE', 'MEDICO', 'RECEPCIONISTA', 'ADMIN', 'FINANCEIRO', 'LABORATORIO', 'FARMACIA'];
-/** Perfis da equipe que operam a recepção (o Administrador herda os casos da Recepcionista). */
-export const RECEPCAO: Perfil[] = ['RECEPCIONISTA', 'ADMIN'];
 
 export interface UsuarioToken {
-  id: number;
-  nome: string;
+  id: string; // UUID
   tipo: Perfil;
+  nome: string;
 }
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       usuario: UsuarioToken;
@@ -24,31 +22,55 @@ declare global {
   }
 }
 
-export const gerarToken = (u: UsuarioToken) => jwt.sign(u, config.jwtSecret, { expiresIn: '12h' });
+export const RECEPCAO: Perfil[] = ['RECEPCIONISTA', 'ADMIN'];
 
-export function lerToken(token: string): UsuarioToken {
+export function hashSenha(senha: string): string {
+  return bcrypt.hashSync(senha, 10);
+}
+
+export const senhaForte = z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.');
+
+export function lerToken(token: string): UsuarioToken | null {
   try {
-    const dados = jwt.verify(token, config.jwtSecret) as UsuarioToken;
-    const atual = one<{ ativo: number; tipo: Perfil; nome: string }>('SELECT ativo, tipo, nome FROM usuarios WHERE id = ?', dados.id);
-    if (!atual || !atual.ativo) throw new HttpError(401, 'Usuário inativo. Fale com o administrador.');
-    // o perfil sempre vem do banco: mudanças de permissão valem na hora
-    return { id: dados.id, nome: atual.nome, tipo: atual.tipo };
-  } catch (e) {
-    if (e instanceof HttpError) throw e;
-    throw new HttpError(401, 'Sessão expirada. Entre novamente.');
+    return jwt.verify(token, config.jwtSecret) as UsuarioToken;
+  } catch {
+    return null;
   }
 }
 
-/** Exige usuário autenticado. */
-export function autenticar(req: Request, _res: Response, next: NextFunction) {
-  const h = req.headers.authorization;
-  if (!h?.startsWith('Bearer ')) throw new HttpError(401, 'Entre no sistema para continuar.');
-  req.usuario = lerToken(h.slice(7));
+// Middleware de autenticação por Token JWT
+export async function autenticar(req: Request, _res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) throw new HttpError(401, 'Token não informado.');
+
+  const [, token] = authHeader.split(' ');
+  const payload = lerToken(token ?? '');
+  if (!payload) throw new HttpError(401, 'Token inválido ou expirado.');
+
+  // Verifica no Supabase se o usuário ainda está ativo
+  const { data: usuario } = await supabase
+    .from('usuarios')
+    .select('id, tipo, nome, ativo')
+    .eq('id', payload.id)
+    .single();
+
+  if (!usuario || !usuario.ativo) {
+    throw new HttpError(401, 'Usuário inativo ou não encontrado.');
+  }
+
+  req.usuario = { id: usuario.id, tipo: usuario.tipo as Perfil, nome: usuario.nome };
   next();
 }
 
-/** Restringe a rota a determinados perfis. */
-export const permitir = (...perfis: Perfil[]) => (req: Request, _res: Response, next: NextFunction) => {
-  if (!perfis.includes(req.usuario.tipo)) throw proibido();
-  next();
-};
+export function permitir(...perfis: Perfil[]) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.usuario || !perfis.includes(req.usuario.tipo)) {
+      throw new HttpError(403, 'Acesso não autorizado.');
+    }
+    next();
+  };
+}
+
+export function proibido(): HttpError {
+  return new HttpError(403, 'Acesso proibido.');
+}

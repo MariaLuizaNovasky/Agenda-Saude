@@ -1,232 +1,300 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { permitir, RECEPCAO, type Perfil } from '../auth.js';
-import { all, one, run, transacao } from '../db.js';
-import { auditar, crmFormatoValido, HttpError, idParam, naoEncontrado, UFS, validar } from '../util.js';
-import { hashSenha, senhaForte } from './auth.js';
+import { autenticar, permitir, type Perfil } from '../auth.js';
+import { criarConta, emailEmUso } from '../contas.js';
+import { especialidadesDosMedicos, medicosPorId, q, usuariosPorId } from '../dados.js';
+import { supabase } from '../supabase.js';
+import { deBanco, ehData, intervaloDia, somarDias } from '../tempo.js';
+import { auditar, crmFormatoValido, HttpError, UFS, validar } from '../util.js';
 
-/* ------------------------------------------------------------------
- * Administrador: usuários e permissões, especialidades, convênios
- * ------------------------------------------------------------------ */
 export const adminRouter = Router();
+/** Catálogo público (leitura sem login: a tela de cadastro do paciente usa os convênios). */
+export const catalogoRouter = Router();
 
-const PERFIS_EQUIPE = ['RECEPCIONISTA', 'MEDICO', 'ADMIN', 'FINANCEIRO', 'LABORATORIO', 'FARMACIA'] as const;
+const idNumerico = (v: unknown) => {
+  const id = Number(v);
+  if (!Number.isInteger(id) || id <= 0) throw new HttpError(400, 'ID inválido.');
+  return id;
+};
 
-adminRouter.get('/usuarios', permitir('ADMIN'), (req, res) => {
-  const { tipo, busca, recuperacao } = req.query as Record<string, string | undefined>;
-  const filtros: string[] = [];
-  const params: (string | number)[] = [];
-  if (tipo) { filtros.push('u.tipo = ?'); params.push(tipo); }
-  if (busca) { filtros.push('(u.nome LIKE ? OR u.email LIKE ?)'); params.push(`%${busca}%`, `%${busca}%`); }
-  if (recuperacao === '1') filtros.push('u.recuperacao_solicitada = 1');
+const somenteAdmin = [autenticar, permitir('ADMIN')];
+
+// --- ESPECIALIDADES ---
+catalogoRouter.get('/especialidades', async (_req, res) => {
+  const { data, error } = await supabase
+    .from('especialidades')
+    .select('id, nome, medico_especialidade(count)')
+    .order('nome');
+  if (error) throw new HttpError(500, `Erro ao listar especialidades: ${error.message}`);
+
   res.json(
-    all(
-      `SELECT u.id, u.nome, u.email, u.telefone, u.tipo, u.ativo, u.troca_senha_obrigatoria, u.recuperacao_solicitada, u.criado_em,
-              m.crm, m.crm_uf, m.crm_verificado,
-              (SELECT group_concat(especialidade_id) FROM medico_especialidade WHERE medico_id = u.id) AS especialidade_ids
-       FROM usuarios u LEFT JOIN medicos m ON m.usuario_id = u.id
-       ${filtros.length ? 'WHERE ' + filtros.join(' AND ') : ''}
-       ORDER BY u.recuperacao_solicitada DESC, u.nome`,
-      ...params,
-    ),
+    (data ?? []).map((e: any) => ({
+      id: e.id,
+      nome: e.nome,
+      total_medicos: e.medico_especialidade?.[0]?.count ?? 0,
+    })),
   );
 });
 
-const medicoSchema = z.object({
-  crm: z.string().trim().refine(crmFormatoValido, 'CRM deve ter de 4 a 7 dígitos.'),
-  crm_uf: z.enum(UFS as [string, ...string[]], 'Escolha a UF do CRM.'),
-  especialidade_ids: z.array(z.number().int().positive()).min(1, 'Escolha ao menos uma especialidade.'),
+const esquemaEsp = z.object({ nome: z.string().trim().min(2, 'Informe o nome da especialidade.') });
+
+catalogoRouter.post('/especialidades', ...somenteAdmin, async (req, res) => {
+  const { nome } = validar(esquemaEsp, req.body);
+  const { data, error } = await supabase.from('especialidades').insert([{ nome }]).select().single();
+  if (error) throw new HttpError(400, error.code === '23505' ? 'Essa especialidade já existe.' : error.message);
+  await auditar(req.usuario.id, 'especialidades', data.id, 'CRIOU_ESPECIALIDADE', { nome });
+  res.status(201).json(data);
 });
 
-// Administrador.gerenciarUsuarios(): cria membro da equipe com senha temporária
-adminRouter.post('/usuarios', permitir('ADMIN'), (req, res) => {
-  const base = validar(
+catalogoRouter.put('/especialidades/:id', ...somenteAdmin, async (req, res) => {
+  const id = idNumerico(String(req.params.id));
+  const { nome } = validar(esquemaEsp, req.body);
+  const { data, error } = await supabase.from('especialidades').update({ nome }).eq('id', id).select().single();
+  if (error || !data) throw new HttpError(400, error?.message ?? 'Especialidade não encontrada.');
+  await auditar(req.usuario.id, 'especialidades', id, 'RENOMEOU_ESPECIALIDADE', { nome });
+  res.json(data);
+});
+
+catalogoRouter.delete('/especialidades/:id', ...somenteAdmin, async (req, res) => {
+  const id = idNumerico(String(req.params.id));
+  const { error } = await supabase.from('especialidades').delete().eq('id', id);
+  if (error) {
+    throw new HttpError(400, error.code === '23503' ? 'Há médicos ou pedidos ligados a essa especialidade.' : error.message);
+  }
+  await auditar(req.usuario.id, 'especialidades', id, 'EXCLUIU_ESPECIALIDADE');
+  res.json({ mensagem: 'Especialidade excluída.' });
+});
+
+// --- CONVÊNIOS ---
+catalogoRouter.get('/convenios', async (_req, res) => {
+  const { data, error } = await supabase.from('convenios').select('id, nome, registro_ans').order('nome');
+  if (error) throw new HttpError(500, `Erro ao listar convênios: ${error.message}`);
+  res.json(data ?? []);
+});
+
+const esquemaConv = z.object({
+  nome: z.string().trim().min(2, 'Informe o nome do convênio.'),
+  registro_ans: z
+    .string()
+    .trim()
+    .regex(/^(\d{6})?$/, 'O registro ANS tem 6 dígitos.')
+    .nullish()
+    .transform((v) => v || null),
+});
+
+catalogoRouter.post('/convenios', ...somenteAdmin, async (req, res) => {
+  const d = validar(esquemaConv, req.body);
+  const { data, error } = await supabase.from('convenios').insert([d]).select().single();
+  if (error) throw new HttpError(400, error.code === '23505' ? 'Esse convênio já existe.' : error.message);
+  await auditar(req.usuario.id, 'convenios', data.id, 'CRIOU_CONVENIO', d);
+  res.status(201).json(data);
+});
+
+catalogoRouter.put('/convenios/:id', ...somenteAdmin, async (req, res) => {
+  const id = idNumerico(String(req.params.id));
+  const d = validar(esquemaConv, req.body);
+  const { data, error } = await supabase.from('convenios').update(d).eq('id', id).select().single();
+  if (error || !data) throw new HttpError(400, error?.message ?? 'Convênio não encontrado.');
+  await auditar(req.usuario.id, 'convenios', id, 'EDITOU_CONVENIO', d);
+  res.json(data);
+});
+
+catalogoRouter.delete('/convenios/:id', ...somenteAdmin, async (req, res) => {
+  const id = idNumerico(String(req.params.id));
+  const { error } = await supabase.from('convenios').delete().eq('id', id);
+  if (error) throw new HttpError(400, error.code === '23503' ? 'Há pacientes ou boletos ligados a esse convênio.' : error.message);
+  await auditar(req.usuario.id, 'convenios', id, 'EXCLUIU_CONVENIO');
+  res.json({ mensagem: 'Convênio excluído.' });
+});
+
+/* -------------------------------- usuários -------------------------------- */
+
+const bin = (v: unknown) => (v ? 1 : 0);
+
+adminRouter.get('/usuarios', permitir('ADMIN'), async (req, res) => {
+  const { tipo, busca, recuperacao } = req.query as Record<string, string | undefined>;
+  let b = supabase.from('usuarios').select('*');
+  if (tipo) b = b.eq('tipo', tipo);
+  if (recuperacao) b = b.eq('recuperacao_solicitada', true);
+  let rows = await q<any[]>(b.order('nome'));
+  if (busca) {
+    const t = busca.trim().toLowerCase();
+    rows = rows.filter((u) => u.nome.toLowerCase().includes(t) || u.email.toLowerCase().includes(t));
+  }
+  const medIds = rows.filter((u) => u.tipo === 'MEDICO').map((u) => u.id);
+  const [medicos, esps] = await Promise.all([medicosPorId(medIds), especialidadesDosMedicos(medIds)]);
+  res.json(
+    rows.map((u) => {
+      const m = medicos.get(u.id);
+      return {
+        id: u.id,
+        nome: u.nome,
+        email: u.email,
+        telefone: u.telefone ?? null,
+        tipo: u.tipo,
+        ativo: bin(u.ativo),
+        troca_senha_obrigatoria: bin(u.troca_senha_obrigatoria),
+        recuperacao_solicitada: bin(u.recuperacao_solicitada),
+        crm: m?.crm ?? null,
+        crm_uf: m?.crm_uf ?? null,
+        crm_verificado: m ? bin(m.crm_verificado) : null,
+        especialidade_ids: (esps.get(u.id) ?? []).map((e) => e.id).join(',') || null,
+      };
+    }),
+  );
+});
+
+const PERFIS_EQUIPE = ['RECEPCIONISTA', 'MEDICO', 'ADMIN', 'FINANCEIRO', 'LABORATORIO', 'FARMACIA'] as const;
+const camposMedico = {
+  crm: z.string().trim().optional(),
+  crm_uf: z.string().trim().toUpperCase().optional(),
+  especialidade_ids: z.array(z.number().int().positive()).optional(),
+};
+
+function validarMedico(d: { crm?: string; crm_uf?: string; especialidade_ids?: number[] }) {
+  if (!d.crm || !/^\d{4,7}$/.test(d.crm) || !crmFormatoValido(d.crm)) throw new HttpError(400, 'CRM inválido: use de 4 a 7 dígitos.');
+  if (!d.crm_uf || !(UFS as readonly string[]).includes(d.crm_uf)) throw new HttpError(400, 'UF do CRM inválida.');
+  if (!d.especialidade_ids?.length) throw new HttpError(400, 'Escolha ao menos uma especialidade.');
+  return { crm: d.crm, crm_uf: d.crm_uf, especialidade_ids: d.especialidade_ids };
+}
+
+async function crmEmUso(crm: string, uf: string, ignorarId?: string) {
+  let b = supabase.from('medicos').select('usuario_id').eq('crm', crm).eq('crm_uf', uf);
+  if (ignorarId) b = b.neq('usuario_id', ignorarId);
+  return (await q<unknown[]>(b)).length > 0;
+}
+
+async function gravarEspecialidades(medicoId: string, ids: number[]) {
+  await q(supabase.from('medico_especialidade').delete().eq('medico_id', medicoId));
+  await q(supabase.from('medico_especialidade').insert(ids.map((especialidade_id) => ({ medico_id: medicoId, especialidade_id }))));
+}
+
+adminRouter.post('/usuarios', permitir('ADMIN'), async (req, res) => {
+  const d = validar(
     z.object({
       nome: z.string().trim().min(3, 'Informe o nome completo.'),
-      email: z.email('Informe um e-mail válido.'),
-      telefone: z.string().trim().optional(),
-      tipo: z.enum(PERFIS_EQUIPE, 'Escolha o perfil de acesso.'),
-      senha_temporaria: senhaForte,
+      email: z.string().trim().email('Informe um e-mail válido.'),
+      telefone: z.string().trim().nullish(),
+      tipo: z.enum(PERFIS_EQUIPE, { message: 'Perfil inválido. Pacientes são cadastrados pela recepção.' }),
+      senha_temporaria: z.string().min(8, 'A senha temporária precisa ter pelo menos 8 caracteres.'),
+      ...camposMedico,
     }),
     req.body,
   );
-  const med = base.tipo === 'MEDICO' ? validar(medicoSchema, req.body) : null;
-  const id = transacao(() => {
-    const { id } = run(
-      'INSERT INTO usuarios (nome, email, senha_hash, telefone, tipo, troca_senha_obrigatoria) VALUES (?,?,?,?,?,1)',
-      base.nome, base.email.toLowerCase(), hashSenha(base.senha_temporaria), base.telefone ?? null, base.tipo,
-    );
+  const med = d.tipo === 'MEDICO' ? validarMedico(d) : null;
+  if (med && (await crmEmUso(med.crm, med.crm_uf))) throw new HttpError(409, 'Este CRM já está cadastrado nessa UF.');
+  if (await emailEmUso(d.email)) throw new HttpError(409, 'E-mail já cadastrado.');
+
+  const id = await criarConta(d.email, d.senha_temporaria, async (id) => {
+    await q(supabase.from('usuarios').insert([{ id, nome: d.nome, email: d.email.toLowerCase(), telefone: d.telefone || null, tipo: d.tipo, troca_senha_obrigatoria: true }]));
     if (med) {
-      run('INSERT INTO medicos (usuario_id, crm, crm_uf) VALUES (?,?,?)', id, med.crm.replace(/\D/g, ''), med.crm_uf);
-      for (const e of med.especialidade_ids) run('INSERT INTO medico_especialidade VALUES (?,?)', id, e);
+      await q(supabase.from('medicos').insert([{ usuario_id: id, crm: med.crm, crm_uf: med.crm_uf, crm_verificado: false }]));
+      await gravarEspecialidades(id, med.especialidade_ids);
     }
-    auditar(req.usuario.id, 'usuarios', id, 'CRIOU_USUARIO', { tipo: base.tipo });
-    return id;
   });
+  await auditar(req.usuario.id, 'usuarios', id, 'CRIOU_USUARIO', { tipo: d.tipo });
   res.status(201).json({ id });
 });
 
-// Administrador.gerenciarPermissoes(): altera perfil, dados e status
-adminRouter.put('/usuarios/:id', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const atual = one<{ tipo: Perfil }>('SELECT tipo FROM usuarios WHERE id = ?', id);
-  if (!atual) throw naoEncontrado('Usuário');
+adminRouter.put('/usuarios/:id', permitir('ADMIN'), async (req, res) => {
+  const id = String(req.params.id);
   const d = validar(
     z.object({
       nome: z.string().trim().min(3, 'Informe o nome completo.'),
       telefone: z.string().trim().nullish(),
-      tipo: z.enum([...PERFIS_EQUIPE, 'PACIENTE']),
+      tipo: z.enum(['PACIENTE', ...PERFIS_EQUIPE]),
       ativo: z.boolean(),
+      ...camposMedico,
     }),
     req.body,
   );
-  // paciente e médico têm tabelas próprias: o perfil deles não pode ser trocado por outro
+  const atual = await q<any>(supabase.from('usuarios').select('*').eq('id', id).maybeSingle());
+  if (!atual) throw new HttpError(404, 'Usuário não encontrado.');
+  if (id === req.usuario.id && (!d.ativo || d.tipo !== 'ADMIN')) throw new HttpError(400, 'Você não pode desativar nem rebaixar o próprio acesso.');
   const fixos: Perfil[] = ['PACIENTE', 'MEDICO'];
   if (d.tipo !== atual.tipo && (fixos.includes(atual.tipo) || fixos.includes(d.tipo))) {
-    throw new HttpError(400, 'Pacientes e médicos não podem mudar de perfil. Crie um novo usuário.');
+    throw new HttpError(400, 'Pacientes e médicos não mudam de perfil. Crie um novo usuário.');
   }
-  if (id === req.usuario.id && (!d.ativo || d.tipo !== 'ADMIN')) {
-    throw new HttpError(400, 'Você não pode desativar nem rebaixar o seu próprio acesso.');
+
+  if (atual.tipo === 'MEDICO' && (d.crm || d.crm_uf || d.especialidade_ids)) {
+    const med = validarMedico(d);
+    if (await crmEmUso(med.crm, med.crm_uf, id)) throw new HttpError(409, 'Este CRM já está cadastrado nessa UF.');
+    await q(supabase.from('medicos').update({ crm: med.crm, crm_uf: med.crm_uf }).eq('usuario_id', id));
+    await gravarEspecialidades(id, med.especialidade_ids);
   }
-  transacao(() => {
-    run('UPDATE usuarios SET nome = ?, telefone = ?, tipo = ?, ativo = ? WHERE id = ?', d.nome, d.telefone, d.tipo, d.ativo, id);
-    if (atual.tipo === 'MEDICO' && req.body.crm !== undefined) {
-      const med = validar(medicoSchema, req.body);
-      run('UPDATE medicos SET crm = ?, crm_uf = ? WHERE usuario_id = ?', med.crm.replace(/\D/g, ''), med.crm_uf, id);
-      run('DELETE FROM medico_especialidade WHERE medico_id = ?', id);
-      for (const e of med.especialidade_ids) run('INSERT INTO medico_especialidade VALUES (?,?)', id, e);
+  await q(supabase.from('usuarios').update({ nome: d.nome, telefone: d.telefone || null, tipo: d.tipo, ativo: d.ativo }).eq('id', id));
+  await auditar(req.usuario.id, 'usuarios', id, atual.ativo && !d.ativo ? 'DESATIVOU_USUARIO' : 'EDITOU_USUARIO', { tipo: d.tipo, ativo: d.ativo });
+  res.json({ ok: true });
+});
+
+adminRouter.post('/usuarios/:id/senha-temporaria', permitir('ADMIN'), async (req, res) => {
+  const id = String(req.params.id);
+  const { senha } = validar(
+    z.object({ senha: z.string().min(8, 'A senha precisa ter pelo menos 8 caracteres.').regex(/[A-Za-z]/, 'A senha precisa ter letras.').regex(/\d/, 'A senha precisa ter números.') }),
+    req.body,
+  );
+  const atual = await q<any>(supabase.from('usuarios').select('id').eq('id', id).maybeSingle());
+  if (!atual) throw new HttpError(404, 'Usuário não encontrado.');
+  const { error } = await supabase.auth.admin.updateUserById(id, { password: senha });
+  if (error) throw new HttpError(400, `Não foi possível trocar a senha: ${error.message}`);
+  await q(supabase.from('usuarios').update({ troca_senha_obrigatoria: true, recuperacao_solicitada: false }).eq('id', id));
+  await auditar(req.usuario.id, 'usuarios', id, 'GEROU_SENHA_TEMPORARIA');
+  res.json({ ok: true });
+});
+
+/* ------------------------------- relatórios ------------------------------- */
+
+adminRouter.get('/relatorios/consultas', permitir('ADMIN'), async (req, res) => {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const inicio = ehData(req.query.inicio) ? req.query.inicio : somarDias(hoje, -30);
+  const fim = ehData(req.query.fim) ? req.query.fim : hoje;
+  const rows = await q<any[]>(
+    supabase
+      .from('consultas')
+      .select('medico_id, tipo, status, check_in_em, iniciada_em')
+      .gte('data_hora', intervaloDia(inicio).de)
+      .lt('data_hora', intervaloDia(fim).ate),
+  );
+  const nomes = await usuariosPorId(rows.map((r) => r.medico_id));
+  const porMedico = new Map<string, any>();
+  for (const c of rows) {
+    if (!porMedico.has(c.medico_id)) {
+      porMedico.set(c.medico_id, { medico_nome: nomes.get(c.medico_id)?.nome ?? '', total: 0, finalizadas: 0, canceladas: 0, faltas: 0, encaixes: 0, retornos: 0, esperas: [] as number[] });
     }
-    auditar(req.usuario.id, 'usuarios', id, 'EDITOU_USUARIO', d);
-  });
-  res.json({ ok: true });
-});
-
-// Gera senha temporária (atende o pedido de recuperação); troca obrigatória no próximo login
-adminRouter.post('/usuarios/:id/senha-temporaria', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const { senha } = validar(z.object({ senha: senhaForte }), req.body);
-  const r = run(
-    'UPDATE usuarios SET senha_hash = ?, troca_senha_obrigatoria = 1, recuperacao_solicitada = 0 WHERE id = ?',
-    hashSenha(senha), id,
-  );
-  if (!r.changes) throw naoEncontrado('Usuário');
-  auditar(req.usuario.id, 'usuarios', id, 'GEROU_SENHA_TEMPORARIA');
-  res.json({ mensagem: 'Senha temporária definida. O usuário terá de trocá-la ao entrar.' });
-});
-
-// Confirmação administrativa da situação do CRM
-adminRouter.post('/medicos/:id/verificar-crm', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const { verificado } = validar(z.object({ verificado: z.boolean() }), req.body);
-  const r = run('UPDATE medicos SET crm_verificado = ? WHERE usuario_id = ?', verificado, id);
-  if (!r.changes) throw naoEncontrado('Médico');
-  auditar(req.usuario.id, 'medicos', id, verificado ? 'CRM_VERIFICADO' : 'CRM_PENDENTE');
-  res.json({ ok: true });
-});
-
-/* ---------------------------- especialidades ---------------------------- */
-// leitura pública: usada no cadastro e na busca de horários
-export const catalogoRouter = Router();
-catalogoRouter.get('/especialidades', (_req, res) => {
+    const l = porMedico.get(c.medico_id);
+    l.total++;
+    if (c.status === 'FINALIZADA') l.finalizadas++;
+    if (c.status === 'CANCELADA') l.canceladas++;
+    if (c.status === 'FALTOU') l.faltas++;
+    if (c.tipo === 'ENCAIXE') l.encaixes++;
+    if (c.tipo === 'RETORNO') l.retornos++;
+    if (c.check_in_em && c.iniciada_em) {
+      const m = (new Date(c.iniciada_em).getTime() - new Date(c.check_in_em).getTime()) / 60000;
+      if (m >= 0) l.esperas.push(m);
+    }
+  }
   res.json(
-    all(`SELECT e.id, e.nome,
-           (SELECT count(*) FROM medico_especialidade me JOIN usuarios u ON u.id = me.medico_id
-             WHERE me.especialidade_id = e.id AND u.ativo = 1) AS total_medicos
-         FROM especialidades e ORDER BY e.nome`),
-  );
-});
-catalogoRouter.get('/convenios', (_req, res) => {
-  res.json(all('SELECT id, nome, registro_ans FROM convenios ORDER BY nome'));
-});
-
-const nomeSchema = z.object({ nome: z.string().trim().min(2, 'Informe o nome.') });
-
-adminRouter.post('/especialidades', permitir('ADMIN'), (req, res) => {
-  const { nome } = validar(nomeSchema, req.body);
-  const { id } = run('INSERT INTO especialidades (nome) VALUES (?)', nome);
-  auditar(req.usuario.id, 'especialidades', id, 'CRIOU', { nome });
-  res.status(201).json({ id });
-});
-adminRouter.put('/especialidades/:id', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const { nome } = validar(nomeSchema, req.body);
-  if (!run('UPDATE especialidades SET nome = ? WHERE id = ?', nome, id).changes) throw naoEncontrado('Especialidade');
-  auditar(req.usuario.id, 'especialidades', id, 'EDITOU', { nome });
-  res.json({ ok: true });
-});
-adminRouter.delete('/especialidades/:id', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const uso = one<{ n: number }>(
-    'SELECT (SELECT count(*) FROM medico_especialidade WHERE especialidade_id = ?) + (SELECT count(*) FROM lista_espera WHERE especialidade_id = ?) AS n',
-    id, id,
-  )!;
-  if (uso.n) throw new HttpError(409, 'Há médicos ou pedidos na lista de espera com esta especialidade.');
-  run('DELETE FROM especialidades WHERE id = ?', id);
-  auditar(req.usuario.id, 'especialidades', id, 'EXCLUIU');
-  res.json({ ok: true });
-});
-
-const convenioSchema = z.object({
-  nome: z.string().trim().min(2, 'Informe o nome.'),
-  registro_ans: z.string().trim().regex(/^\d{6}$/, 'O registro ANS tem 6 dígitos.'),
-});
-adminRouter.post('/convenios', permitir('ADMIN'), (req, res) => {
-  const d = validar(convenioSchema, req.body);
-  const { id } = run('INSERT INTO convenios (nome, registro_ans) VALUES (?,?)', d.nome, d.registro_ans);
-  auditar(req.usuario.id, 'convenios', id, 'CRIOU', d);
-  res.status(201).json({ id });
-});
-adminRouter.put('/convenios/:id', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const d = validar(convenioSchema, req.body);
-  if (!run('UPDATE convenios SET nome = ?, registro_ans = ? WHERE id = ?', d.nome, d.registro_ans, id).changes) throw naoEncontrado('Convênio');
-  auditar(req.usuario.id, 'convenios', id, 'EDITOU', d);
-  res.json({ ok: true });
-});
-adminRouter.delete('/convenios/:id', permitir('ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const uso = one<{ n: number }>('SELECT count(*) AS n FROM pacientes WHERE convenio_id = ?', id)!;
-  if (uso.n) throw new HttpError(409, 'Há pacientes vinculados a este convênio.');
-  run('DELETE FROM convenios WHERE id = ?', id);
-  auditar(req.usuario.id, 'convenios', id, 'EXCLUIU');
-  res.json({ ok: true });
-});
-
-/* ------------------------------ relatórios ------------------------------ */
-adminRouter.get('/relatorios/log', permitir('ADMIN'), (req, res) => {
-  const { entidade, usuario_id } = req.query as Record<string, string | undefined>;
-  const f: string[] = [];
-  const p: (string | number)[] = [];
-  if (entidade) { f.push('l.entidade = ?'); p.push(entidade); }
-  if (usuario_id) { f.push('l.usuario_id = ?'); p.push(Number(usuario_id)); }
-  res.json(
-    all(
-      `SELECT l.*, u.nome AS usuario_nome, u.tipo AS usuario_tipo FROM log_alteracoes l
-       LEFT JOIN usuarios u ON u.id = l.usuario_id ${f.length ? 'WHERE ' + f.join(' AND ') : ''}
-       ORDER BY l.id DESC LIMIT 300`,
-      ...p,
-    ),
+    [...porMedico.values()]
+      .map(({ esperas, ...l }) => ({ ...l, espera_media_min: esperas.length ? Math.round(esperas.reduce((a: number, b: number) => a + b, 0) / esperas.length) : null }))
+      .sort((a, b) => b.total - a.total),
   );
 });
 
-// Administrador.gerarRelatorio(): consultas por médico e status num período
-adminRouter.get('/relatorios/consultas', permitir(...RECEPCAO), (req, res) => {
-  const { inicio, fim } = validar(z.object({ inicio: z.iso.date(), fim: z.iso.date() }), req.query);
+adminRouter.get('/relatorios/log', permitir('ADMIN'), async (req, res) => {
+  let b = supabase.from('log_alteracoes').select('*');
+  if (req.query.entidade) b = b.eq('entidade', String(req.query.entidade));
+  const rows = await q<any[]>(b.order('id', { ascending: false }).limit(500));
+  const usuarios = await usuariosPorId(rows.map((l) => l.usuario_id));
   res.json(
-    all(
-      `SELECT u.nome AS medico_nome, c.medico_id,
-              count(*) AS total,
-              sum(c.status = 'FINALIZADA') AS finalizadas,
-              sum(c.status = 'CANCELADA') AS canceladas,
-              sum(c.status = 'FALTOU') AS faltas,
-              sum(c.tipo = 'ENCAIXE') AS encaixes,
-              sum(c.tipo = 'RETORNO') AS retornos,
-              round(avg(CASE WHEN c.check_in_em IS NOT NULL AND c.iniciada_em IS NOT NULL
-                   THEN (julianday(c.iniciada_em) - julianday(c.check_in_em)) * 1440 END), 0) AS espera_media_min
-       FROM consultas c JOIN usuarios u ON u.id = c.medico_id
-       WHERE substr(c.data_hora,1,10) BETWEEN ? AND ?
-       GROUP BY c.medico_id ORDER BY u.nome`,
-      inicio, fim,
-    ),
+    rows.map((l) => ({
+      id: l.id,
+      usuario_nome: usuarios.get(l.usuario_id)?.nome ?? null,
+      usuario_tipo: usuarios.get(l.usuario_id)?.tipo ?? null,
+      entidade: l.entidade,
+      registro_id: l.registro_id ?? null,
+      acao: l.acao,
+      detalhes: l.detalhes == null ? null : typeof l.detalhes === 'string' ? l.detalhes : JSON.stringify(l.detalhes),
+      data_hora: deBanco(l.data_hora ?? l.criado_em ?? null),
+    })),
   );
 });

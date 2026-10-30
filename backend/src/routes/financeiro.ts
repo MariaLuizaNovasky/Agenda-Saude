@@ -1,136 +1,275 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { permitir } from '../auth.js';
-import { all, one, run } from '../db.js';
-import { auditar, HttpError, hojeISO, idParam, naoEncontrado, notificar, somarDias, validar } from '../util.js';
+import { config } from '../config.js';
+import { convenioNomes, enriquecerConsultas, q, usuariosPorId, type ConsultaLinha } from '../dados.js';
+import { supabase } from '../supabase.js';
+import { intervaloDia } from '../tempo.js';
+import { auditar, HttpError, hojeISO, naoEncontrado, notificar, somarDias, validar } from '../util.js';
 
 export const financeiroRouter = Router();
 
-const SQL_BOLETO = `
-  SELECT b.*, c.data_hora, c.tipo AS consulta_tipo, c.paciente_id, up.nome AS paciente_nome, p.cpf AS paciente_cpf,
-         um.nome AS medico_nome, cv.nome AS convenio_nome,
-         CASE WHEN b.status = 'PENDENTE' AND b.vencimento < date('now','localtime') THEN 1 ELSE 0 END AS vencido
-  FROM boletos b
-  JOIN consultas c ON c.id = b.consulta_id
-  JOIN pacientes p ON p.usuario_id = c.paciente_id
-  JOIN usuarios up ON up.id = c.paciente_id
-  JOIN usuarios um ON um.id = c.medico_id
-  LEFT JOIN convenios cv ON cv.id = b.convenio_id`;
-
 // Consultar boletos (paciente: os próprios) / gerenciar boletos (financeiro e administrador)
-financeiroRouter.get('/boletos', permitir('PACIENTE', 'FINANCEIRO', 'ADMIN'), (req, res) => {
-  const f: string[] = [];
-  const p: (string | number)[] = [];
-  if (req.usuario.tipo === 'PACIENTE') { f.push('c.paciente_id = ?'); p.push(req.usuario.id); }
+financeiroRouter.get('/boletos', permitir('PACIENTE', 'FINANCEIRO', 'ADMIN'), async (req, res) => {
   const { status, busca, tipo } = req.query as Record<string, string | undefined>;
-  if (status) { f.push('b.status = ?'); p.push(status); }
-  if (tipo === 'CONVENIO') f.push('b.convenio_id IS NOT NULL');
-  if (tipo === 'PARTICULAR') f.push('b.convenio_id IS NULL');
-  if (busca) { f.push('(up.nome LIKE ? OR p.cpf LIKE ?)'); p.push(`%${busca}%`, `%${busca.replace(/\D/g, '') || busca}%`); }
-  res.json(all(`${SQL_BOLETO} ${f.length ? 'WHERE ' + f.join(' AND ') : ''} ORDER BY b.status = 'PENDENTE' DESC, b.vencimento DESC LIMIT 500`, ...p));
+  let b = supabase.from('boletos').select('*');
+  if (req.usuario.tipo === 'PACIENTE') {
+    const minhas = (await q<{ id: number }[]>(supabase.from('consultas').select('id').eq('paciente_id', req.usuario.id))).map((c) => c.id);
+    b = b.in('consulta_id', minhas.length ? minhas : [0]);
+  }
+  if (status) b = b.eq('status', status);
+  if (tipo === 'CONVENIO') b = b.not('convenio_id', 'is', null);
+  if (tipo === 'PARTICULAR') b = b.is('convenio_id', null);
+  const rows = await q<any[]>(b.order('vencimento', { ascending: false }).limit(500));
+
+  const consultas = await q<ConsultaLinha[]>(supabase.from('consultas').select('*').in('id', rows.length ? rows.map((r) => r.consulta_id) : [0]));
+  const porId = new Map((await enriquecerConsultas(consultas)).map((c) => [c.id, c]));
+  const convenios = await convenioNomes();
+  const hoje = hojeISO();
+
+  let lista = rows.map((bol) => {
+    const c = porId.get(bol.consulta_id);
+    return {
+      ...bol,
+      valor: Number(bol.valor),
+      consulta_tipo: c?.tipo ?? null,
+      data_hora: c?.data_hora ?? null,
+      paciente_id: c?.paciente_id ?? null,
+      paciente_nome: c?.paciente_nome ?? '',
+      paciente_cpf: c?.paciente_cpf ?? '',
+      medico_nome: c?.medico_nome ?? '',
+      convenio_nome: bol.convenio_id ? convenios.get(bol.convenio_id) ?? null : null,
+      vencido: bol.status === 'PENDENTE' && bol.vencimento < hoje ? 1 : 0,
+    };
+  });
+  if (busca) {
+    const termo = busca.toLowerCase();
+    const dig = busca.replace(/\D/g, '');
+    lista = lista.filter((x) => x.paciente_nome.toLowerCase().includes(termo) || (dig.length >= 3 && x.paciente_cpf.includes(dig)) || String(x.id) === busca.trim());
+  }
+  res.json(lista);
 });
 
+/** Ao finalizar a consulta: boleto de R$ 180 (retorno não é cobrado), vencimento em 10 dias. */
+export async function gerarBoletoDaConsulta(consultaId: number, usuarioId: string) {
+  const ja = await q<unknown[]>(supabase.from('boletos').select('id').eq('consulta_id', consultaId));
+  if (ja.length) return;
+  const c = await q<any>(supabase.from('consultas').select('tipo, paciente_id').eq('id', consultaId).single());
+  const pac = await q<any>(supabase.from('pacientes').select('convenio_id').eq('usuario_id', c.paciente_id).maybeSingle());
+  const valor = c.tipo === 'RETORNO' ? 0 : config.valorConsulta;
+  const novo = await q<{ id: number }>(
+    supabase
+      .from('boletos')
+      .insert([{ consulta_id: consultaId, convenio_id: pac?.convenio_id ?? null, valor, vencimento: somarDias(hojeISO(), 10), status: valor === 0 ? 'PAGO' : 'PENDENTE' }])
+      .select('id')
+      .single(),
+  );
+  await auditar(usuarioId, 'boletos', novo.id, 'GEROU_BOLETO', { consulta_id: consultaId, valor });
+  if (valor > 0) await notificar(c.paciente_id, 'Boleto disponível', `O boleto nº ${novo.id} da sua consulta já está disponível.`, '/boletos');
+}
+
 // Boleto.gerar(): para consultas finalizadas que ainda não têm cobrança
-financeiroRouter.post('/boletos', permitir('FINANCEIRO', 'ADMIN'), (req, res) => {
+financeiroRouter.post('/boletos', permitir('FINANCEIRO', 'ADMIN'), async (req, res) => {
   const d = validar(
     z.object({
       consulta_id: z.number().int().positive(),
       valor: z.number().min(0, 'O valor não pode ser negativo.'),
-      vencimento: z.iso.date('Informe o vencimento.'),
+      vencimento: z.string().min(10, 'Informe o vencimento.'),
     }),
     req.body,
   );
-  const c = one<{ status: string; paciente_id: number }>('SELECT status, paciente_id FROM consultas WHERE id = ?', d.consulta_id);
-  if (!c) throw naoEncontrado('Consulta');
-  if (c.status !== 'FINALIZADA') throw new HttpError(400, 'Só consultas finalizadas geram cobrança.');
-  const conv = one<{ convenio_id: number | null }>('SELECT convenio_id FROM pacientes WHERE usuario_id = ?', c.paciente_id)!;
-  const { id } = run(
-    'INSERT INTO boletos (consulta_id, convenio_id, valor, vencimento) VALUES (?,?,?,?)',
-    d.consulta_id, conv.convenio_id, d.valor, d.vencimento,
-  );
-  auditar(req.usuario.id, 'boletos', id, 'GEROU', d);
-  res.status(201).json({ id });
+
+  const { data: consulta } = await supabase
+    .from('consultas')
+    .select('status, paciente_id')
+    .eq('id', d.consulta_id)
+    .single();
+
+  if (!consulta) throw naoEncontrado('Consulta não encontrada.');
+  if (consulta.status !== 'FINALIZADA') throw new HttpError(400, 'Só consultas finalizadas geram cobrança.');
+
+  const { data: paciente } = await supabase
+    .from('pacientes')
+    .select('convenio_id')
+    .eq('usuario_id', consulta.paciente_id)
+    .single();
+
+  const { data: novoBoleto, error } = await supabase
+    .from('boletos')
+    .insert([
+      {
+        consulta_id: d.consulta_id,
+        convenio_id: paciente?.convenio_id || null,
+        valor: d.valor,
+        vencimento: d.vencimento,
+        status: 'PENDENTE'
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) throw new HttpError(400, error.message);
+
+  auditar(req.usuario.id, 'boletos', novoBoleto.id, 'GEROU', d);
+  res.status(201).json({ id: novoBoleto.id });
 });
 
-financeiroRouter.put('/boletos/:id', permitir('FINANCEIRO', 'ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const d = validar(z.object({ valor: z.number().min(0), vencimento: z.iso.date() }), req.body);
-  const b = one<{ status: string }>('SELECT status FROM boletos WHERE id = ?', id);
-  if (!b) throw naoEncontrado('Boleto');
-  if (b.status !== 'PENDENTE') throw new HttpError(400, 'Só boletos pendentes podem ser alterados.');
-  run('UPDATE boletos SET valor = ?, vencimento = ? WHERE id = ?', d.valor, d.vencimento, id);
+financeiroRouter.put('/boletos/:id', permitir('FINANCEIRO', 'ADMIN'), async (req, res) => {
+  const id = Number((req.params as any).id);
+  const d = validar(z.object({ valor: z.number().min(0), vencimento: z.string() }), req.body);
+
+  const { data: boleto } = await supabase.from('boletos').select('status').eq('id', id).maybeSingle();
+  if (!boleto) throw naoEncontrado('Boleto não encontrado.');
+  if (boleto.status !== 'PENDENTE') throw new HttpError(400, 'Só boletos pendentes podem ser alterados.');
+
+  const { error } = await supabase.from('boletos').update(d).eq('id', id);
+  if (error) throw new HttpError(400, error.message);
+
   auditar(req.usuario.id, 'boletos', id, 'EDITOU', d);
   res.json({ ok: true });
 });
 
 // Boleto.darBaixa()
-financeiroRouter.post('/boletos/:id/baixa', permitir('FINANCEIRO', 'ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const b = one<{ status: string; paciente_id: number }>(`${SQL_BOLETO} WHERE b.id = ?`, id);
-  if (!b) throw naoEncontrado('Boleto');
+financeiroRouter.post('/boletos/:id/baixa', permitir('FINANCEIRO', 'ADMIN'), async (req, res) => {
+  const id = Number((req.params as any).id);
+
+  const { data: b } = await supabase
+    .from('boletos')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (!b) throw naoEncontrado('Boleto não encontrado.');
   if (b.status !== 'PENDENTE') throw new HttpError(400, 'Este boleto não está pendente.');
-  run("UPDATE boletos SET status = 'PAGO' WHERE id = ?", id);
+
+  const { error } = await supabase.from('boletos').update({ status: 'PAGO' }).eq('id', id);
+  if (error) throw new HttpError(400, error.message);
+
   auditar(req.usuario.id, 'boletos', id, 'DEU_BAIXA');
-  notificar(b.paciente_id, 'Pagamento confirmado', `O boleto nº ${id} foi registrado como pago.`, '/boletos');
+  
+  const { data: cons } = await supabase.from('consultas').select('paciente_id').eq('id', b.consulta_id).maybeSingle();
+  const pacienteId = cons?.paciente_id;
+  if (pacienteId) {
+    await notificar(pacienteId, 'Pagamento confirmado', `O boleto nº ${id} foi registrado como pago.`, '/boletos');
+  }
+
   res.json({ ok: true });
 });
 
 // Boleto.cancelar()
-financeiroRouter.post('/boletos/:id/cancelar', permitir('FINANCEIRO', 'ADMIN'), (req, res) => {
-  const id = idParam(req);
-  const b = one<{ status: string }>('SELECT status FROM boletos WHERE id = ?', id);
-  if (!b) throw naoEncontrado('Boleto');
+financeiroRouter.post('/boletos/:id/cancelar', permitir('FINANCEIRO', 'ADMIN'), async (req, res) => {
+  const id = Number((req.params as any).id);
+
+  const { data: b } = await supabase.from('boletos').select('status').eq('id', id).maybeSingle();
+  if (!b) throw naoEncontrado('Boleto não encontrado.');
   if (b.status !== 'PENDENTE') throw new HttpError(400, 'Só boletos pendentes podem ser cancelados.');
-  run("UPDATE boletos SET status = 'CANCELADO' WHERE id = ?", id);
+
+  const { error } = await supabase.from('boletos').update({ status: 'CANCELADO' }).eq('id', id);
+  if (error) throw new HttpError(400, error.message);
+
   auditar(req.usuario.id, 'boletos', id, 'CANCELOU');
   res.json({ ok: true });
 });
 
 /* -------------------------------- dashboard -------------------------------- */
 
-// Visualizar dashboard e indicadores
-financeiroRouter.get('/dashboard', permitir('RECEPCIONISTA', 'ADMIN', 'FINANCEIRO'), (req, res) => {
-  const data = typeof req.query.data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.data) ? req.query.data : hojeISO();
-  const dia = one(
-    `SELECT count(*) AS total,
-            coalesce(sum(status = 'AGENDADA'),0) AS agendadas,
-            coalesce(sum(status IN ('CONFIRMADA','EM_ESPERA')),0) AS aguardando,
-            coalesce(sum(status = 'EM_ATENDIMENTO'),0) AS em_atendimento,
-            coalesce(sum(status = 'FINALIZADA'),0) AS finalizadas,
-            coalesce(sum(status = 'CANCELADA'),0) AS canceladas,
-            coalesce(sum(status = 'FALTOU'),0) AS faltas,
-            coalesce(sum(tipo = 'ENCAIXE' AND status <> 'CANCELADA'),0) AS encaixes,
-            coalesce(sum(atraso_min > 0 AND status NOT IN ('CANCELADA','FALTOU')),0) AS com_atraso,
-            round(avg(CASE WHEN check_in_em IS NOT NULL AND iniciada_em IS NOT NULL
-                 THEN (julianday(iniciada_em) - julianday(check_in_em)) * 1440 END), 0) AS espera_media_min
-     FROM consultas WHERE substr(data_hora,1,10) = ?`,
-    data,
-  );
-  const inicio = somarDias(data, -6);
-  const semana = all(
-    `WITH RECURSIVE dias(d) AS (SELECT ? UNION ALL SELECT date(d, '+1 day') FROM dias WHERE d < ?)
-     SELECT d AS data,
-            (SELECT count(*) FROM consultas WHERE substr(data_hora,1,10) = d AND status NOT IN ('CANCELADA')) AS consultas,
-            (SELECT count(*) FROM consultas WHERE substr(data_hora,1,10) = d AND status = 'FALTOU') AS faltas
-     FROM dias`,
-    inicio, data,
-  );
-  const porMedico = all(
-    `SELECT u.nome AS medico_nome, count(c.id) AS consultas,
-            coalesce(sum(c.status = 'FINALIZADA'),0) AS finalizadas,
-            max(coalesce(c.atraso_min,0)) AS atraso_min
-     FROM medicos m JOIN usuarios u ON u.id = m.usuario_id
-     LEFT JOIN consultas c ON c.medico_id = m.usuario_id AND substr(c.data_hora,1,10) = ? AND c.status NOT IN ('CANCELADA')
-     WHERE u.ativo = 1 GROUP BY m.usuario_id ORDER BY consultas DESC, u.nome`,
-    data,
-  );
-  const outros = one(
-    `SELECT (SELECT count(*) FROM lista_espera WHERE ativo = 1) AS lista_espera,
-            (SELECT count(*) FROM boletos WHERE status = 'PENDENTE') AS boletos_pendentes,
-            (SELECT coalesce(sum(valor),0) FROM boletos WHERE status = 'PENDENTE') AS valor_pendente,
-            (SELECT count(*) FROM boletos WHERE status = 'PENDENTE' AND vencimento < date('now','localtime')) AS boletos_vencidos,
-            (SELECT count(*) FROM exames WHERE status <> 'CONCLUIDO') AS exames_em_andamento,
-            (SELECT count(*) FROM pacientes) AS pacientes`,
-  );
-  res.json({ data, dia, semana, porMedico, ...outros });
+financeiroRouter.get('/dashboard', permitir('RECEPCIONISTA', 'ADMIN', 'FINANCEIRO'), async (req, res) => {
+  const dataRef = typeof req.query.data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.data) ? req.query.data : hojeISO();
+
+  // Consultas do dia
+  const { data: consultasDia } = await supabase
+    .from('consultas')
+    .select('*')
+    .gte('data_hora', intervaloDia(dataRef).de)
+    .lt('data_hora', intervaloDia(dataRef).ate);
+
+  const total = consultasDia?.length || 0;
+  const agendadas = consultasDia?.filter(c => c.status === 'AGENDADA').length || 0;
+  const aguardando = consultasDia?.filter(c => ['CONFIRMADA', 'EM_ESPERA'].includes(c.status)).length || 0;
+  const em_atendimento = consultasDia?.filter(c => c.status === 'EM_ATENDIMENTO').length || 0;
+  const finalizadas = consultasDia?.filter(c => c.status === 'FINALIZADA').length || 0;
+  const canceladas = consultasDia?.filter(c => c.status === 'CANCELADA').length || 0;
+  const faltas = consultasDia?.filter(c => c.status === 'FALTOU').length || 0;
+  const encaixes = consultasDia?.filter(c => c.tipo === 'ENCAIXE' && c.status !== 'CANCELADA').length || 0;
+  const com_atraso = consultasDia?.filter(c => (c.atraso_min || 0) > 0 && !['CANCELADA', 'FALTOU'].includes(c.status)).length || 0;
+
+  let somaEsperaMin = 0;
+  let countEspera = 0;
+  consultasDia?.forEach(c => {
+    if (c.check_in_em && c.iniciada_em) {
+      const diffMs = new Date(c.iniciada_em).getTime() - new Date(c.check_in_em).getTime();
+      const diffMin = diffMs / 60000;
+      if (diffMin > 0) {
+        somaEsperaMin += diffMin;
+        countEspera++;
+      }
+    }
+  });
+  const espera_media_min = countEspera > 0 ? Math.round(somaEsperaMin / countEspera) : null;
+
+  const dia = {
+    total, agendadas, aguardando, em_atendimento, finalizadas, canceladas, faltas, encaixes, com_atraso, espera_media_min
+  };
+
+  // Resumo da semana (últimos 7 dias)
+  const inicio = somarDias(dataRef, -6);
+  const semana = [];
+  for (let i = 0; i < 7; i++) {
+    const dStr = somarDias(inicio, i);
+    const { data: cSemana } = await supabase
+      .from('consultas')
+      .select('status')
+      .gte('data_hora', intervaloDia(dStr).de)
+      .lt('data_hora', intervaloDia(dStr).ate);
+
+    const consultasCount = cSemana?.filter(c => c.status !== 'CANCELADA').length || 0;
+    const faltasCount = cSemana?.filter(c => c.status === 'FALTOU').length || 0;
+    semana.push({ data: dStr, consultas: consultasCount, faltas: faltasCount });
+  }
+
+  // Por Médico
+  const medicosRows = await q<{ usuario_id: string }[]>(supabase.from('medicos').select('usuario_id'));
+  const nomesMed = await usuariosPorId(medicosRows.map((m) => m.usuario_id));
+  const medicosAtivos = medicosRows
+    .filter((m) => nomesMed.get(m.usuario_id)?.ativo)
+    .map((m) => ({ usuario_id: m.usuario_id, usuarios: { nome: nomesMed.get(m.usuario_id)!.nome } }));
+
+  const porMedico = [];
+  for (const m of medicosAtivos) {
+    const cMed = consultasDia?.filter(c => c.medico_id === m.usuario_id && c.status !== 'CANCELADA') || [];
+    const finCount = cMed.filter(c => c.status === 'FINALIZADA').length;
+    const maxAtraso = cMed.reduce((max, c) => Math.max(max, c.atraso_min || 0), 0);
+
+    porMedico.push({
+      medico_id: m.usuario_id,
+      medico_nome: (m.usuarios as any)?.nome,
+      consultas: cMed.length,
+      finalizadas: finCount,
+      atraso_min: maxAtraso
+    });
+  }
+  porMedico.sort((a, b) => b.consultas - a.consultas || a.medico_nome.localeCompare(b.medico_nome));
+
+  // Outros indicadores
+  const { count: listaEsperaCount } = await supabase.from('lista_espera').select('*', { count: 'exact', head: true }).eq('ativo', true);
+  const { data: boletosPendentes } = await supabase.from('boletos').select('valor, vencimento').eq('status', 'PENDENTE');
+  
+  const countBoletosPendentes = boletosPendentes?.length || 0;
+  const valor_pendente = boletosPendentes?.reduce((acc, b) => acc + Number(b.valor), 0) || 0;
+  const hojeStr = hojeISO();
+  const boletos_vencidos = boletosPendentes?.filter(b => b.vencimento < hojeStr).length || 0;
+
+  const { count: examesAndamentoCount } = await supabase.from('exames').select('*', { count: 'exact', head: true }).neq('status', 'CONCLUIDO');
+  const { count: pacientesCount } = await supabase.from('pacientes').select('*', { count: 'exact', head: true });
+
+  const outros = {
+    lista_espera: listaEsperaCount || 0,
+    boletos_pendentes: countBoletosPendentes,
+    valor_pendente,
+    boletos_vencidos,
+    exames_em_andamento: examesAndamentoCount || 0,
+    pacientes: pacientesCount || 0
+  };
+
+  res.json({ data: dataRef, dia, semana, porMedico, ...outros });
 });

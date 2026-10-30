@@ -9,7 +9,7 @@ interface TabManagerProps {
   outlet: ReactNode;
   menus: ItemMenu[];
   perfil: Perfil;
-  usuarioId: number;
+  usuarioId: string;
   caminhoInicial: string;
 }
 

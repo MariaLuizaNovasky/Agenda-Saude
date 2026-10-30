@@ -9,12 +9,15 @@ import { clinicoRouter } from './routes/clinico.js';
 import { consultasRouter } from './routes/consultas.js';
 import { financeiroRouter } from './routes/financeiro.js';
 import { pessoasRouter } from './routes/pessoas.js';
-import { one } from './db.js';
-import { tratarErros } from './util.js';
-import { popular } from './seed.js';
 
-// banco vazio: cria os dados fictícios de demonstração
-if (!one('SELECT id FROM usuarios LIMIT 1')) popular();
+const tratarErros: express.ErrorRequestHandler = (err, _req, res, _next) => {
+  console.error('--- ERRO DETECTADO NO BACKEND ---');
+  console.error(err);
+  const status = err.status || 500;
+  const mensagem = err.message || 'Erro interno do servidor.';
+  res.status(status).json({ erro: mensagem });
+};
+
 
 export const app = express();
 app.use(cors({ origin: config.frontendUrl }));
@@ -36,3 +39,4 @@ api.use((_req, res) => res.status(404).json({ erro: 'Rota não encontrada.' }));
 
 app.use('/api', api);
 app.use(tratarErros);
+

@@ -1,365 +1,393 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { permitir, RECEPCAO, type UsuarioToken } from '../auth.js';
-import { montarFila, SQL_CONSULTA, STATUS_ATIVOS, validarHorario } from '../agenda.js';
-import { config } from '../config.js';
-import { all, one, run, transacao } from '../db.js';
+import { montarFila, STATUS_ATIVOS, validarHorario, validarPacienteLivre } from '../agenda.js';
+import { buscarConsulta, consultaCompleta, enriquecerConsultas, especialidadesDosMedicos, q, usuariosPorId, type ConsultaLinha } from '../dados.js';
 import { emitir } from '../events.js';
-import { agoraCompleto, agoraISO, auditar, HttpError, hojeISO, idParam, naoEncontrado, notificar, proibido, somarDias, validar } from '../util.js';
+import { supabase } from '../supabase.js';
+import { agoraLocal, deBanco, ehData, hojeLocal, intervaloDia, paraBanco, somarMinutos } from '../tempo.js';
+import { auditar, HttpError, notificar, validar } from '../util.js';
+import { gerarBoletoDaConsulta } from './financeiro.js';
 
 export const consultasRouter = Router();
 
-interface Consulta {
-  id: number;
-  paciente_id: number;
-  medico_id: number;
-  data_hora: string;
-  tipo: 'NORMAL' | 'ENCAIXE' | 'RETORNO';
-  status: string;
-  check_in_em: string | null;
-  medico_nome: string;
-  paciente_nome: string;
-}
+const idDe = (v: unknown) => {
+  const id = Number(v);
+  if (!Number.isInteger(id) || id <= 0) throw new HttpError(400, 'ID inválido.');
+  return id;
+};
+const ehRecepcao = (u: UsuarioToken) => RECEPCAO.includes(u.tipo);
+const agoraBanco = () => new Date().toISOString();
+const dataHoraTexto = (dh: string) => `${dh.slice(8, 10)}/${dh.slice(5, 7)} às ${dh.slice(11, 16)}`;
 
-function carregar(id: number) {
-  const c = one<Consulta>(`${SQL_CONSULTA} WHERE c.id = ?`, id);
-  if (!c) throw naoEncontrado('Consulta');
-  return c;
-}
-
-/** Quem pode ver/alterar a consulta: o próprio paciente, o médico dela ou a recepção. */
-function exigirAcesso(u: UsuarioToken, c: Consulta) {
+function exigirAcesso(u: UsuarioToken, c: ConsultaLinha) {
+  if (ehRecepcao(u)) return;
   if (u.tipo === 'PACIENTE' && c.paciente_id === u.id) return;
   if (u.tipo === 'MEDICO' && c.medico_id === u.id) return;
-  if (RECEPCAO.includes(u.tipo)) return;
-  throw proibido();
+  throw new HttpError(403, 'Acesso não autorizado a esta consulta.');
 }
 
-const mudou = () => {
+function exigirMedicoDaConsulta(u: UsuarioToken, c: ConsultaLinha) {
+  if (u.tipo !== 'MEDICO' || c.medico_id !== u.id) throw new HttpError(403, 'Só o médico da consulta pode fazer isso.');
+}
+
+async function atualizar(id: number, campos: Record<string, unknown>) {
+  return q<ConsultaLinha>(supabase.from('consultas').update(campos).eq('id', id).select().single());
+}
+
+/** Avisa o primeiro da lista de espera (maior prioridade, pedido mais antigo) de uma especialidade do médico. */
+async function avisarListaEspera(medicoId: string, dataHora: string) {
+  const esps = (await especialidadesDosMedicos([medicoId])).get(medicoId) ?? [];
+  if (!esps.length) return;
+  const fila = await q<{ id: number; paciente_id: string; especialidade_id: number }[]>(
+    supabase
+      .from('lista_espera')
+      .select('id, paciente_id, especialidade_id')
+      .eq('ativo', true)
+      .in('especialidade_id', esps.map((e) => e.id))
+      .order('prioridade', { ascending: false })
+      .order('data_solicitacao', { ascending: true })
+      .limit(1),
+  );
+  const primeiro = fila[0];
+  if (!primeiro) return;
+  const medico = (await usuariosPorId([medicoId])).get(medicoId);
+  const esp = esps.find((e) => e.id === primeiro.especialidade_id)?.nome ?? '';
+  await notificar(
+    primeiro.paciente_id,
+    'Vaga disponível',
+    `Abriu um horário em ${esp} com ${medico?.nome ?? 'o médico'} em ${dataHoraTexto(dataHora)}. Agende antes que outra pessoa pegue.`,
+    `/agendar?medico=${medicoId}`,
+  );
+}
+
+/* ------------------------------- consultas ------------------------------- */
+
+consultasRouter.get('/consultas', permitir('PACIENTE', 'MEDICO', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const u = req.usuario;
+  const { data, status, medico_id, paciente_id, futuras, ordem } = req.query as Record<string, string | undefined>;
+
+  let b = supabase.from('consultas').select('*');
+  if (u.tipo === 'PACIENTE') b = b.eq('paciente_id', u.id);
+  else if (u.tipo === 'MEDICO') b = b.eq('medico_id', u.id);
+  else {
+    if (medico_id) b = b.eq('medico_id', medico_id);
+    if (paciente_id) b = b.eq('paciente_id', paciente_id);
+  }
+  if (ehData(data)) {
+    const dia = intervaloDia(data);
+    b = b.gte('data_hora', dia.de).lt('data_hora', dia.ate);
+  }
+  if (status) b = b.in('status', status.split(',').map((s) => s.trim().toUpperCase()));
+  if (futuras) b = b.gte('data_hora', intervaloDia(hojeLocal()).de);
+
+  const asc = ordem === 'asc' || ehData(data) || !!futuras;
+  const rows = await q<ConsultaLinha[]>(b.order('data_hora', { ascending: asc }).limit(500));
+  res.json(await enriquecerConsultas(rows));
+});
+
+consultasRouter.get('/consultas/:id', async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirAcesso(req.usuario, c);
+  const [completa] = await enriquecerConsultas([c]);
+  // a anotação clínica é só do médico
+  if (req.usuario.tipo !== 'MEDICO') completa.anotacoes = null;
+  res.json(completa);
+});
+
+const esquemaNova = z.object({
+  medico_id: z.string().min(1, 'Escolha o médico.'),
+  data_hora: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Data e hora inválidas.'),
+  tipo: z.enum(['NORMAL', 'ENCAIXE', 'RETORNO']).default('NORMAL'),
+  paciente_id: z.string().nullish(),
+  lista_espera_id: z.number().int().positive().nullish(),
+});
+
+consultasRouter.post('/consultas', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const u = req.usuario;
+  const d = validar(esquemaNova, req.body);
+  const dataHora = d.data_hora.slice(0, 16);
+
+  let pacienteId: string;
+  if (u.tipo === 'PACIENTE') {
+    if (d.tipo === 'ENCAIXE') throw new HttpError(403, 'Encaixe só pode ser feito pela recepção.');
+    pacienteId = u.id;
+  } else {
+    if (!d.paciente_id) throw new HttpError(400, 'Escolha o paciente.');
+    pacienteId = d.paciente_id;
+    const pac = await q<{ usuario_id: string } | null>(supabase.from('pacientes').select('usuario_id').eq('usuario_id', pacienteId).maybeSingle());
+    if (!pac) throw new HttpError(404, 'Paciente não encontrado.');
+  }
+
+  await validarHorario(d.medico_id, dataHora, d.tipo);
+  await validarPacienteLivre(pacienteId, dataHora);
+
+  const nova = await q<ConsultaLinha>(
+    supabase
+      .from('consultas')
+      .insert([{ paciente_id: pacienteId, medico_id: d.medico_id, data_hora: paraBanco(dataHora), tipo: d.tipo, status: 'AGENDADA' }])
+      .select()
+      .single(),
+  );
+
+  // pedido da lista de espera atendido
+  if (d.lista_espera_id) {
+    await supabase.from('lista_espera').update({ ativo: false }).eq('id', d.lista_espera_id).eq('paciente_id', pacienteId);
+  }
+
+  await auditar(u.id, 'consultas', nova.id, 'AGENDOU', { data_hora: dataHora, tipo: d.tipo, paciente_id: pacienteId });
+  if (u.tipo !== 'PACIENTE') {
+    await notificar(pacienteId, 'Consulta agendada', `Sua consulta foi marcada para ${dataHoraTexto(dataHora)}.`, '/minhas-consultas');
+  }
+  await notificar(d.medico_id, d.tipo === 'ENCAIXE' ? 'Novo encaixe' : 'Nova consulta', `Consulta marcada para ${dataHoraTexto(dataHora)}.`, '/agenda');
+  emitir('agenda');
+  if (dataHora.slice(0, 10) === hojeLocal()) emitir('fila');
+
+  res.status(201).json(await consultaCompleta(nova.id));
+});
+
+consultasRouter.put('/consultas/:id/reagendar', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirAcesso(req.usuario, c);
+  const { data_hora } = validar(z.object({ data_hora: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Data e hora inválidas.') }), req.body);
+  const novo = data_hora.slice(0, 16);
+  if (!['AGENDADA', 'CONFIRMADA'].includes(c.status)) throw new HttpError(400, 'Só consultas ainda não iniciadas podem ser remarcadas.');
+
+  const antigo = deBanco(c.data_hora)!;
+  await validarHorario(c.medico_id, novo, c.tipo, c.id);
+  await validarPacienteLivre(c.paciente_id, novo, c.id);
+  await atualizar(c.id, { data_hora: paraBanco(novo), check_in_em: null });
+
+  await auditar(req.usuario.id, 'consultas', c.id, 'REMARCOU', { de: antigo, para: novo });
+  const aviso = `Consulta de ${dataHoraTexto(antigo)} remarcada para ${dataHoraTexto(novo)}.`;
+  if (req.usuario.id !== c.paciente_id) await notificar(c.paciente_id, 'Consulta remarcada', aviso, '/minhas-consultas');
+  await notificar(c.medico_id, 'Consulta remarcada', aviso, '/agenda');
+  if (c.tipo !== 'ENCAIXE' && antigo > agoraLocal()) await avisarListaEspera(c.medico_id, antigo);
+  emitir('agenda');
+  emitir('fila');
+  res.json(await consultaCompleta(c.id));
+});
+
+consultasRouter.post('/consultas/:id/cancelar', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirAcesso(req.usuario, c);
+  const { motivo } = validar(z.object({ motivo: z.string().trim().min(3, 'Informe o motivo do cancelamento.') }), req.body);
+  if (!['AGENDADA', 'CONFIRMADA', 'EM_ESPERA'].includes(c.status)) throw new HttpError(400, 'Esta consulta não pode mais ser cancelada.');
+
+  await atualizar(c.id, { status: 'CANCELADA', motivo_cancelamento: motivo });
+  const dh = deBanco(c.data_hora)!;
+  await auditar(req.usuario.id, 'consultas', c.id, 'CANCELOU', { motivo });
+  if (req.usuario.id !== c.paciente_id) await notificar(c.paciente_id, 'Consulta cancelada', `Sua consulta de ${dataHoraTexto(dh)} foi cancelada. Motivo: ${motivo}`, '/minhas-consultas');
+  await notificar(c.medico_id, 'Consulta cancelada', `A consulta de ${dataHoraTexto(dh)} foi cancelada.`, '/agenda');
+  if (c.tipo !== 'ENCAIXE' && dh > agoraLocal()) await avisarListaEspera(c.medico_id, dh);
+  emitir('agenda');
+  emitir('fila');
+  res.json(await consultaCompleta(c.id));
+});
+
+// Paciente chegou: faz o check-in no dia da consulta
+consultasRouter.post('/consultas/:id/checkin', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirAcesso(req.usuario, c);
+  if (c.status !== 'AGENDADA') throw new HttpError(400, 'O check-in desta consulta já foi feito ou ela não está mais ativa.');
+  if (deBanco(c.data_hora)!.slice(0, 10) !== hojeLocal()) throw new HttpError(400, 'O check-in só pode ser feito no dia da consulta.');
+
+  await atualizar(c.id, { status: 'CONFIRMADA', check_in_em: agoraBanco() });
+  await auditar(req.usuario.id, 'consultas', c.id, 'CHECK_IN');
   emitir('fila');
   emitir('agenda');
-};
-
-/* --------------------------------- leitura -------------------------------- */
-
-consultasRouter.get('/consultas', (req, res) => {
-  const q = req.query as Record<string, string | undefined>;
-  const f: string[] = [];
-  const p: (string | number)[] = [];
-  const u = req.usuario;
-  if (u.tipo === 'PACIENTE') { f.push('c.paciente_id = ?'); p.push(u.id); }
-  else if (u.tipo === 'MEDICO') { f.push('c.medico_id = ?'); p.push(u.id); }
-  else if (!RECEPCAO.includes(u.tipo)) throw proibido();
-  if (q.data) { f.push('substr(c.data_hora,1,10) = ?'); p.push(q.data); }
-  if (q.inicio) { f.push('substr(c.data_hora,1,10) >= ?'); p.push(q.inicio); }
-  if (q.fim) { f.push('substr(c.data_hora,1,10) <= ?'); p.push(q.fim); }
-  if (q.medico_id) { f.push('c.medico_id = ?'); p.push(Number(q.medico_id)); }
-  if (q.paciente_id) { f.push('c.paciente_id = ?'); p.push(Number(q.paciente_id)); }
-  if (q.status) {
-    const sts = q.status.split(',');
-    f.push(`c.status IN (${sts.map(() => '?').join(',')})`);
-    p.push(...sts);
-  }
-  if (q.futuras === '1') { f.push('c.data_hora >= ?'); p.push(hojeISO()); }
-  const ordem = q.ordem === 'desc' ? 'DESC' : 'ASC';
-  res.json(all(`${SQL_CONSULTA} ${f.length ? 'WHERE ' + f.join(' AND ') : ''} ORDER BY c.data_hora ${ordem} LIMIT 500`, ...p));
+  res.json(await consultaCompleta(c.id));
 });
 
-consultasRouter.get('/consultas/:id', (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  const boleto = one('SELECT * FROM boletos WHERE consulta_id = ?', c.id);
-  const exames = all('SELECT * FROM exames WHERE consulta_id = ?', c.id);
-  const documentos = all('SELECT * FROM documentos_medicos WHERE consulta_id = ?', c.id);
-  res.json({ ...c, boleto, exames, documentos });
+// Recepção confirma a presença: o paciente entra na fila
+consultasRouter.post('/consultas/:id/confirmar-presenca', permitir(...RECEPCAO), async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  if (!['AGENDADA', 'CONFIRMADA'].includes(c.status)) throw new HttpError(400, 'Este paciente já está na fila ou a consulta não está ativa.');
+  if (deBanco(c.data_hora)!.slice(0, 10) !== hojeLocal()) throw new HttpError(400, 'Só é possível confirmar presença no dia da consulta.');
+
+  if (c.status === 'AGENDADA') await atualizar(c.id, { status: 'CONFIRMADA', check_in_em: agoraBanco() });
+  await atualizar(c.id, { status: 'EM_ESPERA', ...(c.check_in_em ? {} : { check_in_em: agoraBanco() }) });
+  await auditar(req.usuario.id, 'consultas', c.id, 'CONFIRMOU_PRESENCA');
+  await notificar(c.paciente_id, 'Presença confirmada', 'Você está na fila. Acompanhe sua posição pelo sistema.', '/fila');
+  emitir('fila');
+  emitir('agenda');
+  res.json(await consultaCompleta(c.id));
 });
 
-/* -------------------------------- agendar -------------------------------- */
-
-// Agendar consulta (paciente para si; recepção para qualquer paciente; encaixe só pela recepção)
-consultasRouter.post('/consultas', permitir('PACIENTE', ...RECEPCAO), (req, res) => {
-  const d = validar(
-    z.object({
-      medico_id: z.number().int().positive(),
-      data_hora: z.string(),
-      paciente_id: z.number().int().positive().optional(),
-      tipo: z.enum(['NORMAL', 'ENCAIXE', 'RETORNO']).default('NORMAL'),
-      lista_espera_id: z.number().int().positive().optional(),
-    }),
-    req.body,
-  );
-  const u = req.usuario;
-  const pacienteId = u.tipo === 'PACIENTE' ? u.id : d.paciente_id;
-  if (!pacienteId) throw new HttpError(400, 'Escolha o paciente.');
-  if (d.tipo === 'ENCAIXE' && u.tipo === 'PACIENTE') {
-    throw new HttpError(403, 'Encaixes são feitos pela recepção. Entre na lista de espera para pedir um.');
-  }
-  const pac = one('SELECT u.ativo FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE p.usuario_id = ?', pacienteId);
-  if (!pac) throw naoEncontrado('Paciente');
-  validarHorario(d.medico_id, d.data_hora, d.tipo);
-  const id = transacao(() => {
-    const { id } = run(
-      'INSERT INTO consultas (paciente_id, medico_id, data_hora, tipo) VALUES (?,?,?,?)',
-      pacienteId, d.medico_id, d.data_hora, d.tipo,
-    );
-    if (d.lista_espera_id) run('UPDATE lista_espera SET ativo = 0 WHERE id = ? AND paciente_id = ?', d.lista_espera_id, pacienteId);
-    auditar(u.id, 'consultas', id, 'AGENDOU', { tipo: d.tipo, data_hora: d.data_hora });
-    return id;
-  });
-  const c = carregar(id);
-  if (u.tipo !== 'PACIENTE') {
-    notificar(pacienteId, 'Consulta marcada', `${c.medico_nome} em ${fmt(c.data_hora)}${d.tipo === 'ENCAIXE' ? ' (encaixe)' : ''}.`, '/consultas');
-    emitir('notificacao');
-  }
-  mudou();
-  res.status(201).json(c);
+consultasRouter.post('/consultas/:id/faltou', permitir(...RECEPCAO), async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  if (!['AGENDADA', 'CONFIRMADA', 'EM_ESPERA'].includes(c.status)) throw new HttpError(400, 'Não é possível registrar falta nesta consulta.');
+  await atualizar(c.id, { status: 'FALTOU' });
+  await auditar(req.usuario.id, 'consultas', c.id, 'REGISTROU_FALTA');
+  emitir('fila');
+  emitir('agenda');
+  res.json(await consultaCompleta(c.id));
 });
 
-const fmt = (dh: string) => `${dh.slice(8, 10)}/${dh.slice(5, 7)} às ${dh.slice(11, 16)}`;
+consultasRouter.post('/consultas/:id/iniciar', async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirMedicoDaConsulta(req.usuario, c);
+  if (c.status !== 'EM_ESPERA') throw new HttpError(400, 'O paciente ainda não está na fila de espera.');
+  const emCurso = await q<{ id: number }[]>(supabase.from('consultas').select('id').eq('medico_id', c.medico_id).eq('status', 'EM_ATENDIMENTO'));
+  if (emCurso.length) throw new HttpError(409, 'Finalize o atendimento em andamento antes de chamar o próximo.');
 
-// Consulta.reagendar(novaData)
-consultasRouter.put('/consultas/:id/reagendar', (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (req.usuario.tipo === 'MEDICO') throw proibido();
-  if (!['AGENDADA', 'CONFIRMADA'].includes(c.status)) throw new HttpError(400, 'Só é possível remarcar consultas que ainda não começaram.');
-  const { data_hora } = validar(z.object({ data_hora: z.string() }), req.body);
-  validarHorario(c.medico_id, data_hora, c.tipo, c.id);
-  run("UPDATE consultas SET data_hora = ?, status = 'AGENDADA', check_in_em = NULL, atraso_min = 0 WHERE id = ?", data_hora, c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'REAGENDOU', { de: c.data_hora, para: data_hora });
-  avisarVaga(c);
-  mudou();
-  res.json(carregar(c.id));
+  await atualizar(c.id, { status: 'EM_ATENDIMENTO', iniciada_em: agoraBanco() });
+  await auditar(req.usuario.id, 'consultas', c.id, 'INICIOU_ATENDIMENTO');
+  await notificar(c.paciente_id, 'Sua vez', `${req.usuario.nome} está chamando você.`, '/fila');
+  emitir('fila');
+  res.json(await consultaCompleta(c.id));
 });
 
-// Consulta.cancelar(motivo) — ao liberar a vaga, avisa a lista de espera (ListaEspera.notificarVaga)
-consultasRouter.post('/consultas/:id/cancelar', (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (!['AGENDADA', 'CONFIRMADA', 'EM_ESPERA'].includes(c.status)) throw new HttpError(400, 'Esta consulta não pode mais ser cancelada.');
-  const { motivo } = validar(z.object({ motivo: z.string().trim().min(3, 'Informe o motivo do cancelamento.') }), req.body);
-  run("UPDATE consultas SET status = 'CANCELADA', motivo_cancelamento = ? WHERE id = ?", motivo, c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'CANCELOU', { motivo });
-  if (req.usuario.id !== c.paciente_id) {
-    notificar(c.paciente_id, 'Consulta cancelada', `Sua consulta com ${c.medico_nome} em ${fmt(c.data_hora)} foi cancelada. Motivo: ${motivo}`, '/consultas');
-  }
-  avisarVaga(c);
-  mudou();
-  emitir('notificacao');
-  res.json({ ok: true });
+consultasRouter.post('/consultas/:id/voltar-fila', async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirMedicoDaConsulta(req.usuario, c);
+  if (c.status !== 'EM_ATENDIMENTO') throw new HttpError(400, 'Esta consulta não está em atendimento.');
+  await atualizar(c.id, { status: 'EM_ESPERA', iniciada_em: null });
+  await auditar(req.usuario.id, 'consultas', c.id, 'VOLTOU_FILA');
+  emitir('fila');
+  res.json(await consultaCompleta(c.id));
 });
 
-/** Avisa o primeiro da lista de espera (maior prioridade, pedido mais antigo) de cada especialidade do médico. */
-function avisarVaga(c: Consulta) {
-  if (c.data_hora <= agoraISO()) return;
-  const pedidos = all<{ id: number; paciente_id: number; especialidade: string }>(
-    `SELECT le.id, le.paciente_id, e.nome AS especialidade FROM lista_espera le
-     JOIN especialidades e ON e.id = le.especialidade_id
-     WHERE le.ativo = 1 AND le.paciente_id <> ? AND le.especialidade_id IN (SELECT especialidade_id FROM medico_especialidade WHERE medico_id = ?)
-     ORDER BY le.prioridade DESC, le.data_solicitacao ASC LIMIT 1`,
-    c.paciente_id, c.medico_id,
-  );
-  for (const p of pedidos) {
-    notificar(p.paciente_id, 'Vaga disponível', `Abriu um horário de ${p.especialidade} com ${c.medico_nome} em ${fmt(c.data_hora)}. Agende antes que outra pessoa marque.`, `/agendar?medico=${c.medico_id}&data=${c.data_hora.slice(0, 10)}`);
-    for (const r of all<{ id: number }>("SELECT id FROM usuarios WHERE tipo = 'RECEPCIONISTA' AND ativo = 1")) {
-      notificar(r.id, 'Vaga para a lista de espera', `Horário livre com ${c.medico_nome} em ${fmt(c.data_hora)}. Há pedido de ${p.especialidade} aguardando.`, '/lista-espera');
-    }
-  }
-  emitir('notificacao');
-}
+consultasRouter.post('/consultas/:id/finalizar', async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirMedicoDaConsulta(req.usuario, c);
+  const { anotacoes } = validar(z.object({ anotacoes: z.string().nullish() }), req.body ?? {});
+  if (c.status !== 'EM_ATENDIMENTO') throw new HttpError(400, 'Esta consulta não está em atendimento.');
 
-/* ---------------------------- check-in e fila ---------------------------- */
-
-// Consulta.realizarCheckIn(): paciente no dia (até 30 min após o horário); recepção já confirma presença
-consultasRouter.post('/consultas/:id/checkin', permitir('PACIENTE', ...RECEPCAO), (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (c.data_hora.slice(0, 10) !== hojeISO()) throw new HttpError(400, 'O check-in só pode ser feito no dia da consulta.');
-  if (c.status !== 'AGENDADA') throw new HttpError(400, 'O check-in desta consulta já foi feito.');
-  const recepcao = RECEPCAO.includes(req.usuario.tipo);
-  const novo = recepcao ? 'EM_ESPERA' : 'CONFIRMADA';
-  run('UPDATE consultas SET status = ?, check_in_em = ? WHERE id = ?', novo, agoraCompleto(), c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'CHECK_IN');
-  mudou();
-  res.json(carregar(c.id));
+  await atualizar(c.id, { status: 'FINALIZADA', finalizada_em: agoraBanco(), ...(anotacoes != null ? { anotacoes } : {}) });
+  await auditar(req.usuario.id, 'consultas', c.id, 'FINALIZOU_ATENDIMENTO');
+  await gerarBoletoDaConsulta(c.id, req.usuario.id);
+  emitir('fila');
+  emitir('agenda');
+  res.json(await consultaCompleta(c.id));
 });
 
-// Recepcionista.confirmarPresenca(c): coloca o paciente na fila
-consultasRouter.post('/consultas/:id/confirmar-presenca', permitir(...RECEPCAO), (req, res) => {
-  const c = carregar(idParam(req));
-  if (c.data_hora.slice(0, 10) !== hojeISO()) throw new HttpError(400, 'Só é possível confirmar presença no dia da consulta.');
-  if (!['AGENDADA', 'CONFIRMADA'].includes(c.status)) throw new HttpError(400, 'Este paciente já está na fila ou foi atendido.');
-  run("UPDATE consultas SET status = 'EM_ESPERA', check_in_em = coalesce(check_in_em, ?) WHERE id = ?", agoraCompleto(), c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'CONFIRMOU_PRESENCA');
-  mudou();
-  res.json(carregar(c.id));
-});
-
-consultasRouter.post('/consultas/:id/faltou', permitir(...RECEPCAO), (req, res) => {
-  const c = carregar(idParam(req));
-  if (!['AGENDADA', 'CONFIRMADA'].includes(c.status)) throw new HttpError(400, 'Só consultas sem presença confirmada podem ser marcadas como falta.');
-  if (c.data_hora > agoraISO()) throw new HttpError(400, 'O horário desta consulta ainda não chegou.');
-  run("UPDATE consultas SET status = 'FALTOU' WHERE id = ?", c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'MARCOU_FALTA');
-  mudou();
-  res.json({ ok: true });
-});
-
-// Devolve o paciente para a espera (ex.: chamado por engano)
-consultasRouter.post('/consultas/:id/voltar-fila', permitir(...RECEPCAO, 'MEDICO'), (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (c.status !== 'EM_ATENDIMENTO') throw new HttpError(400, 'Só um atendimento em andamento pode voltar para a fila.');
-  run("UPDATE consultas SET status = 'EM_ESPERA', iniciada_em = NULL WHERE id = ?", c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'VOLTOU_FILA');
-  mudou();
-  res.json({ ok: true });
-});
-
-/* ------------------------------- atendimento ------------------------------ */
-
-// Consulta.iniciar()
-consultasRouter.post('/consultas/:id/iniciar', permitir('MEDICO'), (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (c.status !== 'EM_ESPERA') throw new HttpError(400, 'O paciente precisa estar na fila (presença confirmada pela recepção).');
-  const outro = one("SELECT id FROM consultas WHERE medico_id = ? AND status = 'EM_ATENDIMENTO' AND id <> ?", c.medico_id, c.id);
-  if (outro) throw new HttpError(409, 'Finalize o atendimento em andamento antes de chamar o próximo paciente.');
-  run("UPDATE consultas SET status = 'EM_ATENDIMENTO', iniciada_em = ? WHERE id = ?", agoraCompleto(), c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'INICIOU_ATENDIMENTO');
-  notificar(c.paciente_id, 'Sua vez', `${c.medico_nome} está chamando você.`, '/fila');
-  emitir('notificacao');
-  mudou();
-  res.json(carregar(c.id));
-});
-
-consultasRouter.put('/consultas/:id/anotacoes', permitir('MEDICO'), (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
+consultasRouter.put('/consultas/:id/anotacoes', async (req, res) => {
+  const c = await buscarConsulta(idDe(String(req.params.id)));
+  exigirMedicoDaConsulta(req.usuario, c);
   const { anotacoes } = validar(z.object({ anotacoes: z.string() }), req.body);
-  run('UPDATE consultas SET anotacoes = ? WHERE id = ?', anotacoes, c.id);
-  auditar(req.usuario.id, 'consultas', c.id, 'ANOTOU');
-  res.json({ ok: true });
-});
-
-// Consulta.finalizar(): gera o boleto (particular ou convênio)
-consultasRouter.post('/consultas/:id/finalizar', permitir('MEDICO'), (req, res) => {
-  const c = carregar(idParam(req));
-  exigirAcesso(req.usuario, c);
-  if (c.status !== 'EM_ATENDIMENTO') throw new HttpError(400, 'Inicie o atendimento antes de finalizar.');
-  const { anotacoes } = validar(z.object({ anotacoes: z.string().optional() }), req.body);
-  const pac = one<{ convenio_id: number | null }>('SELECT convenio_id FROM pacientes WHERE usuario_id = ?', c.paciente_id)!;
-  transacao(() => {
-    run(
-      "UPDATE consultas SET status = 'FINALIZADA', finalizada_em = ?, anotacoes = coalesce(?, anotacoes) WHERE id = ?",
-      agoraCompleto(), anotacoes ?? null, c.id,
-    );
-    // retorno dentro do prazo e consultas por convênio não geram cobrança ao paciente
-    const valor = c.tipo === 'RETORNO' ? 0 : config.valorConsulta;
-    if (!one('SELECT id FROM boletos WHERE consulta_id = ?', c.id)) {
-      run(
-        'INSERT INTO boletos (consulta_id, convenio_id, valor, vencimento) VALUES (?,?,?,?)',
-        c.id, pac.convenio_id, valor, somarDias(hojeISO(), 10),
-      );
-    }
-    auditar(req.usuario.id, 'consultas', c.id, 'FINALIZOU_ATENDIMENTO');
-  });
-  mudou();
-  res.json(carregar(c.id));
+  if (!['EM_ATENDIMENTO', 'FINALIZADA'].includes(c.status)) throw new HttpError(400, 'Anotações só durante ou depois do atendimento.');
+  await atualizar(c.id, { anotacoes });
+  await auditar(req.usuario.id, 'consultas', c.id, 'EDITOU_ANOTACOES');
+  res.json(await consultaCompleta(c.id));
 });
 
 /* ---------------------------------- fila ---------------------------------- */
 
-// Visualizar / gerenciar a fila do dia
-consultasRouter.get('/fila', permitir(...RECEPCAO, 'MEDICO'), (req, res) => {
-  const medicoId = req.usuario.tipo === 'MEDICO' ? req.usuario.id : req.query.medico_id ? Number(req.query.medico_id) : undefined;
-  res.json({ data: hojeISO(), grupos: montarFila(hojeISO(), medicoId) });
+async function consultasDoDia(data: string, filtro: { medico_id?: string; paciente_id?: string } = {}) {
+  const dia = intervaloDia(data);
+  let b = supabase.from('consultas').select('*').gte('data_hora', dia.de).lt('data_hora', dia.ate).in('status', STATUS_ATIVOS);
+  if (filtro.medico_id) b = b.eq('medico_id', filtro.medico_id);
+  if (filtro.paciente_id) b = b.eq('paciente_id', filtro.paciente_id);
+  return enriquecerConsultas(await q<ConsultaLinha[]>(b));
+}
+
+consultasRouter.get('/fila', permitir('MEDICO', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const data = ehData(req.query.data) ? req.query.data : hojeLocal();
+  const medicoId = req.usuario.tipo === 'MEDICO' ? req.usuario.id : (req.query.medico_id as string | undefined);
+  const consultas = await consultasDoDia(data, medicoId ? { medico_id: medicoId } : {});
+  res.json({ data, grupos: montarFila(consultas) });
 });
 
-// Paciente: acompanhar a própria posição em tempo real (sem ver dados de outros pacientes)
-consultasRouter.get('/fila/minha', permitir('PACIENTE'), (req, res) => {
-  const minhas = all<{ medico_id: number }>(
-    `SELECT DISTINCT medico_id FROM consultas WHERE paciente_id = ? AND substr(data_hora,1,10) = ?
-     AND status IN (${STATUS_ATIVOS.map(() => '?').join(',')})`,
-    req.usuario.id, hojeISO(), ...STATUS_ATIVOS,
-  );
-  const resultado = minhas.flatMap(({ medico_id }) => {
-    const g = montarFila(hojeISO(), medico_id)[0];
-    if (!g) return [];
-    const emEspera = g.itens.filter((i) => i.status === 'EM_ESPERA').length;
-    const emAtendimento = g.itens.some((i) => i.status === 'EM_ATENDIMENTO');
-    return g.itens
-      .filter((i) => i.paciente_id === req.usuario.id)
-      .map((i) => ({
-        consulta_id: i.id,
-        medico_nome: g.medico_nome,
-        data_hora: i.data_hora,
-        status: i.status,
-        tipo: i.tipo,
-        atraso_min: i.atraso_min,
-        previsao: i.previsao,
-        posicao: i.posicao,
-        pessoas_na_frente: i.posicao ? i.posicao - 1 : null,
-        total_em_espera: emEspera,
-        medico_atendendo: emAtendimento,
-      }));
-  });
-  res.json(resultado);
+// Fila do paciente: só a posição dele, sem nomes de outras pessoas
+consultasRouter.get('/fila/minha', permitir('PACIENTE'), async (req, res) => {
+  const hoje = hojeLocal();
+  const minhas = await consultasDoDia(hoje, { paciente_id: req.usuario.id });
+  const resposta = [];
+  for (const m of minhas.sort((a, b) => a.data_hora.localeCompare(b.data_hora))) {
+    const grupo = montarFila(await consultasDoDia(hoje, { medico_id: m.medico_id }))[0];
+    const item = grupo?.itens.find((i) => i.id === m.id);
+    const emEspera = grupo?.itens.filter((i) => i.status === 'EM_ESPERA').length ?? 0;
+    const atraso = grupo?.atraso_min ?? m.atraso_min ?? 0;
+    resposta.push({
+      consulta_id: m.id,
+      medico_nome: m.medico_nome,
+      data_hora: m.data_hora,
+      status: m.status,
+      tipo: m.tipo,
+      atraso_min: atraso,
+      previsao: somarMinutos(m.data_hora, atraso),
+      posicao: item?.posicao ?? null,
+      pessoas_na_frente: item?.posicao ? item.posicao - 1 : null,
+      total_em_espera: emEspera,
+      medico_atendendo: !!grupo?.itens.some((i) => i.status === 'EM_ATENDIMENTO'),
+    });
+  }
+  res.json(resposta);
 });
 
-/* ------------------------------ lista de espera ------------------------------ */
+/* ----------------------------- lista de espera ----------------------------- */
 
-consultasRouter.get('/lista-espera', permitir('PACIENTE', ...RECEPCAO), (req, res) => {
-  const paciente = req.usuario.tipo === 'PACIENTE';
+consultasRouter.get('/lista-espera', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  let b = supabase.from('lista_espera').select('*').eq('ativo', true);
+  if (req.usuario.tipo === 'PACIENTE') b = b.eq('paciente_id', req.usuario.id);
+  const rows = await q<any[]>(b.order('prioridade', { ascending: false }).order('data_solicitacao', { ascending: true }));
+  const [usuarios, esps] = await Promise.all([
+    usuariosPorId(rows.map((r) => r.paciente_id)),
+    q<{ id: number; nome: string }[]>(supabase.from('especialidades').select('id, nome')),
+  ]);
+  const nomesEsp = new Map(esps.map((e) => [e.id, e.nome]));
   res.json(
-    all(
-      `SELECT le.*, e.nome AS especialidade_nome, u.nome AS paciente_nome, u.telefone AS paciente_telefone
-       FROM lista_espera le JOIN especialidades e ON e.id = le.especialidade_id JOIN usuarios u ON u.id = le.paciente_id
-       WHERE le.ativo = 1 ${paciente ? 'AND le.paciente_id = ?' : ''}
-       ORDER BY le.prioridade DESC, le.data_solicitacao ASC`,
-      ...(paciente ? [req.usuario.id] : []),
-    ),
+    rows.map((r) => ({
+      id: r.id,
+      paciente_id: r.paciente_id,
+      especialidade_id: r.especialidade_id,
+      especialidade_nome: nomesEsp.get(r.especialidade_id) ?? '',
+      paciente_nome: usuarios.get(r.paciente_id)?.nome ?? '',
+      paciente_telefone: usuarios.get(r.paciente_id)?.telefone ?? null,
+      data_solicitacao: deBanco(r.data_solicitacao),
+      prioridade: r.prioridade ?? 0,
+      observacao: r.observacao ?? null,
+    })),
   );
 });
 
-// Solicitar encaixe / entrar na lista de espera
-consultasRouter.post('/lista-espera', permitir('PACIENTE', ...RECEPCAO), (req, res) => {
+consultasRouter.post('/lista-espera', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
   const d = validar(
     z.object({
       especialidade_id: z.number().int().positive('Escolha a especialidade.'),
-      paciente_id: z.number().int().positive().optional(),
-      prioridade: z.number().int().min(0).max(2).default(0),
-      observacao: z.string().trim().max(300).optional(),
+      paciente_id: z.string().nullish(),
+      prioridade: z.number().int().min(0).max(2).nullish(),
+      observacao: z.string().trim().max(300, 'A observação pode ter até 300 caracteres.').nullish(),
     }),
     req.body,
   );
   const paciente = req.usuario.tipo === 'PACIENTE';
   const pacienteId = paciente ? req.usuario.id : d.paciente_id;
   if (!pacienteId) throw new HttpError(400, 'Escolha o paciente.');
-  const ja = one('SELECT id FROM lista_espera WHERE paciente_id = ? AND especialidade_id = ? AND ativo = 1', pacienteId, d.especialidade_id);
-  if (ja) throw new HttpError(409, 'Já existe um pedido ativo para esta especialidade.');
-  const { id } = run(
-    'INSERT INTO lista_espera (paciente_id, especialidade_id, prioridade, observacao) VALUES (?,?,?,?)',
-    pacienteId, d.especialidade_id, paciente ? 0 : d.prioridade, d.observacao ?? null,
+
+  const existe = await q<unknown[]>(supabase.from('lista_espera').select('id').eq('paciente_id', pacienteId).eq('especialidade_id', d.especialidade_id).eq('ativo', true));
+  if (existe.length) throw new HttpError(409, 'Já existe um pedido ativo nessa especialidade.');
+
+  const novo = await q<{ id: number }>(
+    supabase
+      .from('lista_espera')
+      .insert([{ paciente_id: pacienteId, especialidade_id: d.especialidade_id, prioridade: paciente ? 0 : d.prioridade ?? 0, observacao: d.observacao || null }])
+      .select('id')
+      .single(),
   );
-  auditar(req.usuario.id, 'lista_espera', id, 'ENTROU_LISTA');
-  res.status(201).json({ id });
+  await auditar(req.usuario.id, 'lista_espera', novo.id, 'ENTROU_LISTA_ESPERA', { especialidade_id: d.especialidade_id });
+  res.status(201).json({ id: novo.id });
 });
 
-consultasRouter.put('/lista-espera/:id', permitir(...RECEPCAO), (req, res) => {
-  const id = idParam(req);
-  const { prioridade } = validar(z.object({ prioridade: z.number().int().min(0).max(2) }), req.body);
-  if (!run('UPDATE lista_espera SET prioridade = ? WHERE id = ?', prioridade, id).changes) throw naoEncontrado('Pedido');
-  auditar(req.usuario.id, 'lista_espera', id, 'ALTEROU_PRIORIDADE', { prioridade });
+consultasRouter.put('/lista-espera/:id', permitir(...RECEPCAO), async (req, res) => {
+  const id = idDe(String(req.params.id));
+  const d = validar(z.object({ prioridade: z.number().int().min(0).max(2), observacao: z.string().trim().max(300, 'A observação pode ter até 300 caracteres.').nullish() }), req.body);
+  const campos: Record<string, unknown> = { prioridade: d.prioridade };
+  if (d.observacao !== undefined) campos.observacao = d.observacao || null;
+  const r = await q<unknown[]>(supabase.from('lista_espera').update(campos).eq('id', id).eq('ativo', true).select('id'));
+  if (!r.length) throw new HttpError(404, 'Pedido não encontrado.');
+  await auditar(req.usuario.id, 'lista_espera', id, 'ALTEROU_PRIORIDADE', campos);
   res.json({ ok: true });
 });
 
-consultasRouter.delete('/lista-espera/:id', permitir('PACIENTE', ...RECEPCAO), (req, res) => {
-  const id = idParam(req);
-  const le = one<{ paciente_id: number }>('SELECT paciente_id FROM lista_espera WHERE id = ? AND ativo = 1', id);
-  if (!le) throw naoEncontrado('Pedido');
-  if (req.usuario.tipo === 'PACIENTE' && le.paciente_id !== req.usuario.id) throw proibido();
-  run('UPDATE lista_espera SET ativo = 0 WHERE id = ?', id);
-  auditar(req.usuario.id, 'lista_espera', id, 'SAIU_LISTA');
+// PACIENTE tenta priorizar: 403 vem do permitir() acima. Remover vale para o dono e para a recepção.
+consultasRouter.delete('/lista-espera/:id', permitir('PACIENTE', 'RECEPCIONISTA', 'ADMIN'), async (req, res) => {
+  const id = idDe(String(req.params.id));
+  let b = supabase.from('lista_espera').update({ ativo: false }).eq('id', id).eq('ativo', true);
+  if (req.usuario.tipo === 'PACIENTE') b = b.eq('paciente_id', req.usuario.id);
+  const r = await q<unknown[]>(b.select('id'));
+  if (!r.length) throw new HttpError(404, 'Pedido não encontrado.');
+  await auditar(req.usuario.id, 'lista_espera', id, 'SAIU_LISTA_ESPERA');
   res.json({ ok: true });
 });
