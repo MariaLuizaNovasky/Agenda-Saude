@@ -112,19 +112,15 @@ authRouter.put('/perfil', autenticar, (req, res) => {
     z.object({
       nome: z.string().trim().min(3, 'Informe o nome completo.'),
       telefone: z.string().trim().min(10, 'Informe um telefone com DDD.'),
-      convenio_id: z.number().int().positive().nullish(),
-      numero_carteirinha: z.string().trim().nullish(),
-    }),
+      data_nascimento: z.iso.date('Informe uma data de nascimento válida.').optional(),
+    }).strict(),
     req.body,
   );
+  if (d.data_nascimento && req.usuario.tipo !== 'PACIENTE') throw new HttpError(403, 'Seu perfil não pode alterar a data de nascimento.');
   transacao(() => {
     run('UPDATE usuarios SET nome = ?, telefone = ? WHERE id = ?', d.nome, d.telefone, req.usuario.id);
-    if (req.usuario.tipo === 'PACIENTE') {
-      if (d.convenio_id && !d.numero_carteirinha) throw new HttpError(400, 'Informe o número da carteirinha do convênio.');
-      run(
-        'UPDATE pacientes SET convenio_id = ?, numero_carteirinha = ? WHERE usuario_id = ?',
-        d.convenio_id, d.convenio_id ? d.numero_carteirinha : null, req.usuario.id,
-      );
+    if (d.data_nascimento) {
+      run('UPDATE pacientes SET data_nascimento = ? WHERE usuario_id = ?', d.data_nascimento, req.usuario.id);
     }
     auditar(req.usuario.id, 'usuarios', req.usuario.id, 'EDITOU_DADOS');
   });

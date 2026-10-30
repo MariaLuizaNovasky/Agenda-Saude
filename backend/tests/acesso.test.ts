@@ -1,6 +1,6 @@
 // Meta do TAP: nenhum acesso indevido entre perfis
 import { describe, expect, it } from 'vitest';
-import { api, EMAILS, entrar, get, post } from './helpers.js';
+import { api, EMAILS, entrar, get, post, put } from './helpers.js';
 
 describe('autenticação obrigatória', () => {
   it('rotas protegidas sem token respondem 401', async () => {
@@ -55,6 +55,36 @@ describe('paciente', () => {
     const ana = (await entrar(EMAILS.ana)).id;
     const r = await api.put(`/api/usuarios/${ana}`).set('Authorization', `Bearer ${(await entrar(EMAILS.ana)).token}`).send({ nome: 'Ana', tipo: 'ADMIN', ativo: true });
     expect(r.status).toBe(403);
+  });
+
+  it('não altera CPF, convênio ou carteirinha em Meus dados', async () => {
+    const antes = await get(EMAILS.ana, '/api/auth/me');
+    const r = await put(EMAILS.ana, '/api/auth/perfil', {
+      nome: antes.body.nome,
+      telefone: antes.body.telefone,
+      cpf: '390.533.447-05',
+      convenio_id: 1,
+      numero_carteirinha: 'ALTERADA',
+    });
+
+    expect(r.status).toBe(400);
+    const depois = await get(EMAILS.ana, '/api/auth/me');
+    expect(depois.body.cpf).toBe(antes.body.cpf);
+    expect(depois.body.convenio_id).toBe(antes.body.convenio_id);
+    expect(depois.body.numero_carteirinha).toBe(antes.body.numero_carteirinha);
+  });
+
+  it('permite alterar a data de nascimento em Meus dados', async () => {
+    const antes = await get(EMAILS.ana, '/api/auth/me');
+    const novaData = antes.body.data_nascimento === '1990-01-01' ? '1990-01-02' : '1990-01-01';
+    const r = await put(EMAILS.ana, '/api/auth/perfil', {
+      nome: antes.body.nome,
+      telefone: antes.body.telefone,
+      data_nascimento: novaData,
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body.data_nascimento).toBe(novaData);
   });
 
   it('fila do paciente não vaza dados de outros pacientes', async () => {
@@ -112,8 +142,11 @@ describe('farmácia e laboratório', () => {
     expect((await get(EMAILS.farmacia, '/api/exames')).status).toBe(403);
   });
 
-  it('farmácia só encontra receitas buscando por CPF ou número; sem busca vem vazio', async () => {
-    expect((await get(EMAILS.farmacia, '/api/documentos')).body).toEqual([]);
+  it('farmácia vê receitas disponíveis por padrão e busca pelo CPF ou número', async () => {
+    const disponiveis = await get(EMAILS.farmacia, '/api/documentos');
+    expect(disponiveis.status).toBe(200);
+    expect(disponiveis.body.length).toBeGreaterThan(0);
+    expect(disponiveis.body.every((d: { tipo: string; data_retirada: string | null }) => d.tipo === 'RECEITA' && d.data_retirada === null)).toBe(true);
     expect((await get(EMAILS.farmacia, '/api/documentos?busca=abc')).body).toEqual([]);
     const r = await get(EMAILS.farmacia, '/api/documentos?busca=123.456.789-09');
     expect(r.status).toBe(200);
