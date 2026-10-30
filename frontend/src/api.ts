@@ -7,7 +7,7 @@ export type StatusConsulta = 'AGENDADA' | 'CONFIRMADA' | 'EM_ESPERA' | 'EM_ATEND
 export type TipoConsulta = 'NORMAL' | 'ENCAIXE' | 'RETORNO';
 
 export interface Usuario {
-  id: number;
+  id: string;
   nome: string;
   email: string;
   telefone: string | null;
@@ -25,8 +25,8 @@ export interface Usuario {
 
 export interface Consulta {
   id: number;
-  paciente_id: number;
-  medico_id: number;
+  paciente_id: string;
+  medico_id: string;
   data_hora: string;
   tipo: TipoConsulta;
   status: StatusConsulta;
@@ -50,7 +50,7 @@ export interface Consulta {
 export interface Especialidade { id: number; nome: string; total_medicos?: number }
 export interface Convenio { id: number; nome: string; registro_ans: string }
 export interface Medico {
-  id: number;
+  id: string;
   nome: string;
   crm: string;
   crm_uf: string;
@@ -60,7 +60,7 @@ export interface Medico {
   atraso_hoje: number | null;
 }
 export interface Paciente {
-  id: number;
+  id: string;
   nome: string;
   email: string;
   telefone: string | null;
@@ -85,10 +85,10 @@ export interface Exame {
   arquivo_nome: string | null;
   prazo_retorno_dias: number | null;
   data_limite_retorno: string | null;
-  paciente_id: number;
+  paciente_id: string;
   paciente_nome: string;
   paciente_cpf: string;
-  medico_id: number;
+  medico_id: string;
   medico_nome: string;
 }
 export interface Documento {
@@ -98,7 +98,7 @@ export interface Documento {
   conteudo: string;
   data_emissao: string;
   data_retirada: string | null;
-  paciente_id: number;
+  paciente_id: string;
   paciente_nome: string;
   paciente_cpf: string;
   medico_nome: string | null;
@@ -122,7 +122,7 @@ export interface Boleto {
 }
 export interface ItemListaEspera {
   id: number;
-  paciente_id: number;
+  paciente_id: string;
   especialidade_id: number;
   especialidade_nome: string;
   paciente_nome: string;

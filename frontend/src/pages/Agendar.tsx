@@ -14,7 +14,7 @@ export function Agendar() {
   const especialidades = useCarregar(() => api.get<Especialidade[]>('/especialidades'));
   const medicos = useCarregar(() => api.get<Medico[]>('/medicos'));
   const [esp, setEsp] = useState<number | null>(null);
-  const [medicoId, setMedicoId] = useState<number | null>(params.get('medico') ? Number(params.get('medico')) : null);
+  const [medicoId, setMedicoId] = useState<string | null>(params.get('medico'));
   const [horario, setHorario] = useState<string | null>(null);
   const [executar, executando] = useAcao();
 
@@ -46,7 +46,7 @@ export function Agendar() {
         <li className="passo">
           <h2>Especialidade</h2>
           <div className="opcoes">
-            {especialidades.dados?.filter((e) => e.total_medicos).map((e) => (
+            {especialidades.dados?.map((e) => (
               <button key={e.id} type="button" className="opcao" aria-pressed={esp === e.id} onClick={() => { setEsp(e.id); setMedicoId(null); setHorario(null); }}>
                 {e.nome}
               </button>

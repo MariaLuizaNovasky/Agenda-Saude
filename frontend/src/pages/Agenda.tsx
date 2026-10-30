@@ -123,7 +123,7 @@ function porHora(lista: Consulta[]): [string, Consulta[]][] {
 
 function ModalNovaConsulta({ aberto, dia, medicos, aoFechar, aoConcluir }: { aberto: boolean; dia: string; medicos: Medico[]; aoFechar: () => void; aoConcluir: () => void }) {
   const [paciente, setPaciente] = useState<Paciente | null>(null);
-  const [medicoId, setMedicoId] = useState<number | null>(null);
+  const [medicoId, setMedicoId] = useState<string | null>(null);
   const [modo, setModo] = useState<'NORMAL' | 'RETORNO' | 'ENCAIXE'>('NORMAL');
   const [horario, setHorario] = useState<string | null>(null);
   const [encHora, setEncHora] = useState('');
@@ -140,7 +140,7 @@ function ModalNovaConsulta({ aberto, dia, medicos, aoFechar, aoConcluir }: { abe
           <BuscaPaciente valor={paciente} aoEscolher={setPaciente} />
         </Campo>
         <Campo rotulo="Médico">
-          <select value={medicoId ?? ''} onChange={(e) => { setMedicoId(e.target.value ? Number(e.target.value) : null); setHorario(null); }}>
+          <select value={medicoId ?? ''} onChange={(e) => { setMedicoId(e.target.value || null); setHorario(null); }}>
             <option value="">Escolha</option>
             {medicos.map((m) => <option key={m.id} value={m.id}>{m.nome} ({m.especialidades})</option>)}
           </select>

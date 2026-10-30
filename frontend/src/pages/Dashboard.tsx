@@ -11,7 +11,7 @@ interface Dados {
     canceladas: number; faltas: number; encaixes: number; com_atraso: number; espera_media_min: number | null;
   };
   semana: { data: string; consultas: number; faltas: number }[];
-  porMedico: { medico_nome: string; consultas: number; finalizadas: number; atraso_min: number }[];
+  porMedico: { medico_id: string; medico_nome: string; consultas: number; finalizadas: number; atraso_min: number }[];
   lista_espera: number;
   boletos_pendentes: number;
   valor_pendente: number;
@@ -101,7 +101,7 @@ export function Dashboard() {
             <thead><tr><th>Médico</th><th className="num">Consultas</th><th className="num">Finalizadas</th><th className="num">Atraso</th></tr></thead>
             <tbody>
               {dados.porMedico.map((m) => (
-                <tr key={m.medico_nome}>
+                <tr key={m.medico_id}>
                   <td data-rotulo="Médico">{m.medico_nome}</td>
                   <td data-rotulo="Consultas" className="num">{m.consultas}</td>
                   <td data-rotulo="Finalizadas" className="num">{m.finalizadas}</td>

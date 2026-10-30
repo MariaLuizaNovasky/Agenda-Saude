@@ -141,7 +141,7 @@ function ModalNovoPedido({ aberto, recepcao, especialidades, aoFechar, aoConclui
 /** Recepção agenda o pedido: num horário livre ou como encaixe no dia. */
 function ModalEncaixe({ item, aoFechar, aoConcluir }: { item: ItemListaEspera | null; aoFechar: () => void; aoConcluir: () => void }) {
   const medicos = useCarregar(() => (item ? api.get<Medico[]>(`/medicos?especialidade_id=${item.especialidade_id}`) : Promise.resolve([])), [item?.id]);
-  const [medicoId, setMedicoId] = useState<number | null>(null);
+  const [medicoId, setMedicoId] = useState<string | null>(null);
   const [modo, setModo] = useState<'vaga' | 'encaixe'>('vaga');
   const [horario, setHorario] = useState<string | null>(null);
   const [encDia, setEncDia] = useState(hojeISO());
@@ -157,7 +157,7 @@ function ModalEncaixe({ item, aoFechar, aoConcluir }: { item: ItemListaEspera | 
         <div className="form">
           <p className="texto-suave">{item.especialidade_nome}, pedido de {data(item.data_solicitacao)}. {item.observacao}</p>
           <Campo rotulo="Médico">
-            <select value={medicoId ?? ''} onChange={(e) => { setMedicoId(e.target.value ? Number(e.target.value) : null); setHorario(null); }}>
+            <select value={medicoId ?? ''} onChange={(e) => { setMedicoId(e.target.value || null); setHorario(null); }}>
               <option value="">Escolha</option>
               {medicos.dados?.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
             </select>

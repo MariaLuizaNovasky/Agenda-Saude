@@ -13,7 +13,7 @@ export function SeletorHorario({
   aoEscolher,
   dataInicial,
 }: {
-  medicoId: number;
+  medicoId: string;
   valor: string | null;
   aoEscolher: (dataHora: string | null) => void;
   dataInicial?: string | null;
