@@ -5,16 +5,6 @@ import { useAuth } from '../auth';
 import { Bolinha, Estrela, SetaDiagonal, Simbolo } from '../components/Icones';
 import { Aviso, Botao, Campo } from '../components/ui';
 
-const DEMO = [
-  ['Paciente', 'paciente@agendasaude.com'],
-  ['Recepção', 'recepcao@agendasaude.com'],
-  ['Médica', 'helena@agendasaude.com'],
-  ['Administrador', 'admin@agendasaude.com'],
-  ['Financeiro', 'financeiro@agendasaude.com'],
-  ['Laboratório', 'laboratorio@agendasaude.com'],
-  ['Farmácia', 'farmacia@agendasaude.com'],
-];
-
 /** Moldura das telas de acesso. */
 export function TelaAcesso({ titulo, children, lateral }: { titulo: string; children: ReactNode; lateral?: ReactNode }) {
   return (
@@ -86,30 +76,7 @@ export function Entrar() {
   };
 
   return (
-    <TelaAcesso
-      titulo="Entrar"
-      lateral={
-        <div className="acesso-demo">
-          <p>Para testar, escolha um perfil (senha <strong>Senha123</strong>):</p>
-          <ul>
-            {DEMO.map(([perfil, mail]) => (
-              <li key={mail}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail(mail);
-                    setSenha('Senha123');
-                  }}
-                >
-                  <span>{perfil}</span>
-                  <span className="acesso-demo-email">{mail}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      }
-    >
+    <TelaAcesso titulo="Entrar">
       <form onSubmit={enviar} className="form">
         {erro && <Aviso tom="erro">{erro}</Aviso>}
         <Campo rotulo="E-mail">
