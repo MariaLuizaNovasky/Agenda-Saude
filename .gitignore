@@ -7,6 +7,3 @@ build/
 .env
 .env.local
 *.log
-
-# Ignorar totalmente a pasta do frontend para a sua dupla
-frontend/
