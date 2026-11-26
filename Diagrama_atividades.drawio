@@ -271,7 +271,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="Após o atendimento" id="nZrwYlSx4mvpnehNlmoT">
-    <mxGraphModel dx="3233" dy="1508" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1780" pageHeight="1577" math="0" shadow="0">
+    <mxGraphModel dx="3821" dy="1782" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1780" pageHeight="1577" math="0" shadow="0">
       <root>
         <mxCell id="at2_0" />
         <mxCell id="at2_1" parent="at2_0" />
@@ -485,7 +485,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="at2_nota" parent="at2_1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=8;fontSize=12;fillColor=#FFFDE7;strokeColor=#C8B84A;" value="Começa quando o atendimento é finalizado (aba &quot;Do agendamento ao atendimento&quot;). Os três caminhos acontecem em paralelo: exame e retorno, receita e pagamento. A consulta de retorno segue de novo o fluxo da primeira aba, a partir do check-in." vertex="1">
-          <mxGeometry height="70" width="1490" x="40" y="1417" as="geometry" />
+          <mxGeometry height="70" width="1490" x="40" y="1440" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
