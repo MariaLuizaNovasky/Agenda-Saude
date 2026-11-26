@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net">
+<mxfile host="app.diagrams.net" pages="3">
   <diagram id="database" name="Banco de Dados">
     <mxGraphModel dx="1406" dy="733" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1150" math="0" shadow="0">
       <root>
@@ -111,6 +111,219 @@
             </Array>
           </mxGeometry>
         </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Banco de dados" id="VJh1aHrGYWrei11ewO1m">
+    <mxGraphModel dx="3076" dy="1434" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1420" pageHeight="1466" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="T_AUTH_USERS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#F5F5F5;strokeColor=#999999;swimlaneFillColor=#F5F5F5;dashed=1;fontFamily=Helvetica;" value="AUTH.USERS &lt;span style=&quot;&quot;&gt;(Supabase)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="66" width="220" x="560" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="T_AUTH_USERS_c" parent="T_AUTH_USERS" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;email" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_NOTIFICACOES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="NOTIFICACOES" vertex="1">
+          <mxGeometry height="136" width="220" x="820" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="T_NOTIFICACOES_c" parent="T_NOTIFICACOES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;usuario_id (FK)&lt;br&gt;titulo&lt;br&gt;mensagem&lt;br&gt;link&lt;br&gt;lida&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_ESPECIALIDADES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="ESPECIALIDADES" vertex="1">
+          <mxGeometry height="66" width="220" x="40" y="256" as="geometry" />
+        </mxCell>
+        <mxCell id="T_ESPECIALIDADES_c" parent="T_ESPECIALIDADES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;nome (UNIQUE)" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_LISTA_ESPERA" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="LISTA_ESPERA" vertex="1">
+          <mxGeometry height="136" width="220" x="300" y="256" as="geometry" />
+        </mxCell>
+        <mxCell id="T_LISTA_ESPERA_c" parent="T_LISTA_ESPERA" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK)&lt;br&gt;especialidade_id (FK)&lt;br&gt;data_solicitacao&lt;br&gt;prioridade&lt;br&gt;ativo&lt;br&gt;observacao" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_USUARIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="USUARIOS" vertex="1">
+          <mxGeometry height="192" width="220" x="560" y="256" as="geometry" />
+        </mxCell>
+        <mxCell id="T_USUARIOS_c" parent="T_USUARIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK, FK -&amp;gt; AUTH.USERS)&lt;br&gt;nome&lt;br&gt;email (UNIQUE)&lt;br&gt;telefone&lt;br&gt;tipo (PACIENTE | MEDICO | RECEPCIONISTA | ADMIN | FINANCEIRO | LABORATORIO | FARMACIA)&lt;br&gt;ativo&lt;br&gt;troca_senha_obrigatoria&lt;br&gt;recuperacao_solicitada&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="166" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_LOG_ALTERACOES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="LOG_ALTERACOES" vertex="1">
+          <mxGeometry height="136" width="220" x="1080" y="256" as="geometry" />
+        </mxCell>
+        <mxCell id="T_LOG_ALTERACOES_c" parent="T_LOG_ALTERACOES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;usuario_id (FK, NULL)&lt;br&gt;entidade&lt;br&gt;registro_id&lt;br&gt;acao&lt;br&gt;detalhes&lt;br&gt;data_hora" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_MEDICO_ESPECIALIDADE" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="MEDICO_ESPECIALIDADE" vertex="1">
+          <mxGeometry height="66" width="220" x="40" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="T_MEDICO_ESPECIALIDADE_c" parent="T_MEDICO_ESPECIALIDADE" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="medico_id (PK, FK)&lt;br&gt;especialidade_id (PK, FK)" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_MEDICOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="MEDICOS" vertex="1">
+          <mxGeometry height="94" width="220" x="300" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="T_MEDICOS_c" parent="T_MEDICOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br&gt;crm (UNIQUE com crm_uf)&lt;br&gt;crm_uf&lt;br&gt;crm_verificado" vertex="1">
+          <mxGeometry height="68" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_PACIENTES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="PACIENTES" vertex="1">
+          <mxGeometry height="108" width="220" x="820" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="T_PACIENTES_c" parent="T_PACIENTES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br&gt;cpf (UNIQUE)&lt;br&gt;data_nascimento&lt;br&gt;convenio_id (FK, NULL)&lt;br&gt;numero_carteirinha" vertex="1">
+          <mxGeometry height="82" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_CONVENIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="CONVENIOS" vertex="1">
+          <mxGeometry height="80" width="220" x="1080" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="T_CONVENIOS_c" parent="T_CONVENIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;nome (UNIQUE)&lt;br&gt;registro_ans" vertex="1">
+          <mxGeometry height="54" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_DISPONIBILIDADES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="DISPONIBILIDADES" vertex="1">
+          <mxGeometry height="122" width="220" x="300" y="716" as="geometry" />
+        </mxCell>
+        <mxCell id="T_DISPONIBILIDADES_c" parent="T_DISPONIBILIDADES" style="text;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;medico_id (FK)&lt;br&gt;dia_semana&lt;br&gt;hora_inicio&lt;br&gt;hora_fim&lt;br&gt;duracao_min" vertex="1">
+          <mxGeometry height="96" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_CONSULTAS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="CONSULTAS" vertex="1">
+          <mxGeometry height="248" width="220" x="560" y="716" as="geometry" />
+        </mxCell>
+        <mxCell id="T_CONSULTAS_c" parent="T_CONSULTAS" style="text;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fillColor=#f5f5f5;strokeColor=default;fontColor=#333333;fillStyle=auto;labelBackgroundColor=none;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK)&lt;br&gt;medico_id (FK)&lt;br&gt;data_hora&lt;br&gt;tipo (NORMAL | ENCAIXE | RETORNO)&lt;br&gt;status (AGENDADA | CONFIRMADA | EM_ESPERA | EM_ATENDIMENTO | FINALIZADA | CANCELADA | FALTOU)&lt;br&gt;check_in_em&lt;br&gt;atraso_min&lt;br&gt;anotacoes&lt;br&gt;motivo_cancelamento&lt;br&gt;iniciada_em&lt;br&gt;finalizada_em&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="222" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_PRONTUARIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="PRONTUARIOS" vertex="1">
+          <mxGeometry height="94" width="220" x="820" y="716" as="geometry" />
+        </mxCell>
+        <mxCell id="T_PRONTUARIOS_c" parent="T_PRONTUARIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK, UNIQUE)&lt;br&gt;alergias&lt;br&gt;observacoes" vertex="1">
+          <mxGeometry height="68" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_DOCUMENTOS_MEDICOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="DOCUMENTOS_MEDICOS" vertex="1">
+          <mxGeometry height="150" width="220" x="1080" y="716" as="geometry" />
+        </mxCell>
+        <mxCell id="T_DOCUMENTOS_MEDICOS_c" parent="T_DOCUMENTOS_MEDICOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;prontuario_id (FK)&lt;br&gt;consulta_id (FK, NULL)&lt;br&gt;medico_id (FK, NULL)&lt;br&gt;tipo (RECEITA | ATESTADO)&lt;br&gt;conteudo&lt;br&gt;data_emissao&lt;br&gt;data_retirada" vertex="1">
+          <mxGeometry height="124" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_BOLETOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="BOLETOS" vertex="1">
+          <mxGeometry height="136" width="220" x="560" y="1044" as="geometry" />
+        </mxCell>
+        <mxCell id="T_BOLETOS_c" parent="T_BOLETOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;consulta_id (FK, UNIQUE)&lt;br&gt;convenio_id (FK, NULL)&lt;br&gt;valor&lt;br&gt;vencimento&lt;br&gt;status (PENDENTE | PAGO | CANCELADO)" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_EXAMES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="EXAMES" vertex="1">
+          <mxGeometry height="192" width="220" x="820" y="1044" as="geometry" />
+        </mxCell>
+        <mxCell id="T_EXAMES_c" parent="T_EXAMES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;prontuario_id (FK)&lt;br&gt;consulta_id (FK)&lt;br&gt;tipo&lt;br&gt;status (SOLICITADO | COLETADO | CONCLUIDO)&lt;br&gt;data_solicitacao&lt;br&gt;data_resultado&lt;br&gt;arquivo_resultado&lt;br&gt;arquivo_nome&lt;br&gt;prazo_retorno_dias" vertex="1">
+          <mxGeometry height="166" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_STORAGE_OBJECTS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#F5F5F5;strokeColor=#999999;swimlaneFillColor=#F5F5F5;dashed=1;fontFamily=Helvetica;" value="STORAGE.OBJECTS &lt;span style=&quot;&quot;&gt;(Supabase)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="80" width="220" x="1080" y="1044" as="geometry" />
+        </mxCell>
+        <mxCell id="T_STORAGE_OBJECTS_c" parent="T_STORAGE_OBJECTS" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;bucket_id (resultados-exames)&lt;br&gt;name" vertex="1">
+          <mxGeometry height="54" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="r0" edge="1" parent="1" source="T_USUARIOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_AUTH_USERS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="T_NOTIFICACOES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="T_LOG_ALTERACOES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="T_LISTA_ESPERA" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_ESPECIALIDADES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="T_LISTA_ESPERA" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="498" />
+              <mxPoint x="930" y="498" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="T_MEDICO_ESPECIALIDADE" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_ESPECIALIDADES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="T_MEDICO_ESPECIALIDADE" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERoneToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" edge="1" parent="1" source="T_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" edge="1" parent="1" source="T_PACIENTES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" edge="1" parent="1" source="T_PACIENTES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONVENIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r10" edge="1" parent="1" source="T_DISPONIBILIDADES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r11" edge="1" parent="1" source="T_CONSULTAS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r12" edge="1" parent="1" source="T_CONSULTAS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r13" edge="1" parent="1" source="T_PRONTUARIOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERmandOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r14" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PRONTUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r15" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1190" y="1004" />
+              <mxPoint x="747" y="1004" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r16" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1190" y="688" />
+              <mxPoint x="487" y="688" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r17" edge="1" parent="1" source="T_BOLETOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r18" edge="1" parent="1" source="T_BOLETOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONVENIOS" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="1276" />
+              <mxPoint x="1340" y="1276" />
+              <mxPoint x="1340" y="568" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r19" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PRONTUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r20" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r21" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;dashed=1;endArrow=open;endFill=0;startArrow=none;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_STORAGE_OBJECTS" value="arquivo do resultado">
+          <mxGeometry relative="1" x="-0.2882" y="-27" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nota" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=6;fontSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontFamily=Helvetica;fontStyle=0" value="Recepcionista, administrador, financeiro, laboratório e farmácia não têm tabela própria: o perfil fica em USUARIOS.tipo. A senha fica no Supabase Auth (AUTH.USERS)." vertex="1">
+          <mxGeometry height="92" width="220" x="40" y="716" as="geometry" />
+        </mxCell>
+        <mxCell id="regras" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fillColor=#FFF2CC;strokeColor=#D6B656;fontFamily=Helvetica;fontStyle=0" value="&lt;span&gt;Regras garantidas pelo banco&lt;/span&gt;&lt;br&gt;• CONSULTAS: sem dois agendamentos no mesmo horário do médico (exceto encaixe) ou do paciente; um médico com no máximo uma consulta EM_ATENDIMENTO; o status só avança pelas etapas previstas.&lt;br&gt;• DISPONIBILIDADES: horários do mesmo médico não se sobrepõem. • LISTA_ESPERA: uma solicitação ativa por paciente e especialidade.&lt;br&gt;• LOG_ALTERACOES não pode ser alterado nem apagado. • Regras de acesso (RLS) em todas as tabelas.&lt;br&gt;&lt;span&gt;Legenda:&lt;/span&gt; PK chave primária · FK chave estrangeira · UNIQUE valor único · NULL chave opcional · linha tracejada: referência ao arquivo no Storage (não é FK)." vertex="1">
+          <mxGeometry height="110" width="1260" x="40" y="1316" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Página-2" id="qO-N2473w7PQQ2bEXnaD">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
       </root>
     </mxGraphModel>
   </diagram>
