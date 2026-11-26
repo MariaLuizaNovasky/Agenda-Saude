@@ -1,491 +1,205 @@
-<mxfile host="app.diagrams.net" pages="2">
-  <diagram name="Do agendamento ao atendimento" id="HW-deIrIJAS-qL2Qji6J">
-    <mxGraphModel dx="1261" dy="588" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="2577" math="0" shadow="0">
+<mxfile host="app.diagrams.net">
+  <diagram name="Banco de dados" id="XeK7T2RXIpvi31uLNPhM">
+    <mxGraphModel dx="2627" dy="1225" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1420" pageHeight="1466" math="0" shadow="0">
       <root>
-        <mxCell id="at1_0" />
-        <mxCell id="at1_1" parent="at1_0" />
-        <mxCell id="at1_raia0" parent="at1_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Paciente" vertex="1">
-          <mxGeometry height="2377" width="480" x="40" y="20" as="geometry" />
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="T_AUTH_USERS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#F5F5F5;strokeColor=#999999;swimlaneFillColor=#F5F5F5;dashed=1;fontFamily=Helvetica;" value="AUTH.USERS &lt;span style=&quot;&quot;&gt;(Supabase)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="66" width="220" x="560" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="at1_checkin" parent="at1_raia0" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Fazer check-in no dia da consulta&amp;nbsp;" vertex="1">
-          <mxGeometry height="58" width="210" x="135" y="810" as="geometry" />
+        <mxCell id="T_AUTH_USERS_c" parent="T_AUTH_USERS" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;email" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_raia1" parent="at1_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Sistema" vertex="1">
-          <mxGeometry height="2377" width="480" x="520" y="20" as="geometry" />
+        <mxCell id="T_NOTIFICACOES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="NOTIFICACOES" vertex="1">
+          <mxGeometry height="136" width="220" x="820" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="at1_raia2" parent="at1_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Recepção" vertex="1">
-          <mxGeometry height="2377" width="480" x="1000" y="20" as="geometry" />
+        <mxCell id="T_NOTIFICACOES_c" parent="T_NOTIFICACOES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;usuario_id (FK)&lt;br&gt;titulo&lt;br&gt;mensagem&lt;br&gt;link&lt;br&gt;lida&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_raia3" parent="at1_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Médico" vertex="1">
-          <mxGeometry height="2377" width="480" x="1480" y="20" as="geometry" />
+        <mxCell id="T_ESPECIALIDADES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="ESPECIALIDADES" vertex="1">
+          <mxGeometry height="66" width="220" x="40" y="256" as="geometry" />
         </mxCell>
-        <mxCell id="at1_ini" parent="at1_1" style="ellipse;html=1;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="30" width="30" x="265" y="95" as="geometry" />
+        <mxCell id="T_ESPECIALIDADES_c" parent="T_ESPECIALIDADES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;nome (UNIQUE)" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_esc" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Escolher especialidade, médico e horário" vertex="1">
-          <mxGeometry height="58" width="210" x="175" y="181" as="geometry" />
+        <mxCell id="T_LISTA_ESPERA" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="LISTA_ESPERA" vertex="1">
+          <mxGeometry height="136" width="220" x="300" y="256" as="geometry" />
         </mxCell>
-        <mxCell id="at1_dLivre" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Há horário livre?" vertex="1">
-          <mxGeometry height="74" width="150" x="205" y="273" as="geometry" />
+        <mxCell id="T_LISTA_ESPERA_c" parent="T_LISTA_ESPERA" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK)&lt;br&gt;especialidade_id (FK)&lt;br&gt;data_solicitacao&lt;br&gt;prioridade&lt;br&gt;ativo&lt;br&gt;observacao" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_reg" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar a consulta (AGENDADA) e avisar o médico" vertex="1">
-          <mxGeometry height="58" width="210" x="655" y="281" as="geometry" />
+        <mxCell id="T_USUARIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="USUARIOS" vertex="1">
+          <mxGeometry height="192" width="220" x="560" y="256" as="geometry" />
         </mxCell>
-        <mxCell id="at1_espera" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Entrar na lista de espera" vertex="1">
-          <mxGeometry height="58" width="210" x="54" y="381" as="geometry" />
+        <mxCell id="T_USUARIOS_c" parent="T_USUARIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK, FK -&amp;gt; AUTH.USERS)&lt;br&gt;nome&lt;br&gt;email (UNIQUE)&lt;br&gt;telefone&lt;br&gt;tipo (PACIENTE | MEDICO | RECEPCIONISTA | ADMIN | FINANCEIRO | LABORATORIO | FARMACIA)&lt;br&gt;ativo&lt;br&gt;troca_senha_obrigatoria&lt;br&gt;recuperacao_solicitada&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="166" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_vaga" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Avisar o paciente quando abrir uma vaga" vertex="1">
-          <mxGeometry height="58" width="210" x="534" y="481" as="geometry" />
+        <mxCell id="T_LOG_ALTERACOES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="LOG_ALTERACOES" vertex="1">
+          <mxGeometry height="136" width="220" x="1080" y="256" as="geometry" />
         </mxCell>
-        <mxCell id="at1_dVai" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Vai à consulta?" vertex="1">
-          <mxGeometry height="74" width="150" x="205" y="573" as="geometry" />
+        <mxCell id="T_LOG_ALTERACOES_c" parent="T_LOG_ALTERACOES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;usuario_id (FK, NULL)&lt;br&gt;entidade&lt;br&gt;registro_id&lt;br&gt;acao&lt;br&gt;detalhes&lt;br&gt;data_hora" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_cancela" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Cancelar a consulta" vertex="1">
-          <mxGeometry height="58" width="210" x="54" y="681" as="geometry" />
+        <mxCell id="T_MEDICO_ESPECIALIDADE" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="MEDICO_ESPECIALIDADE" vertex="1">
+          <mxGeometry height="66" width="220" x="40" y="528" as="geometry" />
         </mxCell>
-        <mxCell id="at1_cancelaS" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Marcar como CANCELADA e avisar a lista de espera" vertex="1">
-          <mxGeometry height="58" width="210" x="534" y="781" as="geometry" />
+        <mxCell id="T_MEDICO_ESPECIALIDADE_c" parent="T_MEDICO_ESPECIALIDADE" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="medico_id (PK, FK)&lt;br&gt;especialidade_id (PK, FK)" vertex="1">
+          <mxGeometry height="40" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_fimC" parent="at1_1" style="ellipse;html=1;shape=endState;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="34" width="34" x="622" y="893" as="geometry" />
+        <mxCell id="T_MEDICOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="MEDICOS" vertex="1">
+          <mxGeometry height="94" width="220" x="300" y="528" as="geometry" />
         </mxCell>
-        <mxCell id="at1_dChegou" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Paciente chegou?" vertex="1">
-          <mxGeometry height="74" width="150" x="1165" y="873" as="geometry" />
+        <mxCell id="T_MEDICOS_c" parent="T_MEDICOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br&gt;crm (UNIQUE com crm_uf)&lt;br&gt;crm_uf&lt;br&gt;crm_verificado" vertex="1">
+          <mxGeometry height="68" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_falta" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar falta (FALTOU)" vertex="1">
-          <mxGeometry height="58" width="210" x="1256" y="981" as="geometry" />
+        <mxCell id="T_PACIENTES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="PACIENTES" vertex="1">
+          <mxGeometry height="108" width="220" x="820" y="528" as="geometry" />
         </mxCell>
-        <mxCell id="at1_fimF" parent="at1_1" style="ellipse;html=1;shape=endState;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="34" width="34" x="1344" y="1193" as="geometry" />
+        <mxCell id="T_PACIENTES_c" parent="T_PACIENTES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="usuario_id (PK, FK -&amp;gt; USUARIOS)&lt;br&gt;cpf (UNIQUE)&lt;br&gt;data_nascimento&lt;br&gt;convenio_id (FK, NULL)&lt;br&gt;numero_carteirinha" vertex="1">
+          <mxGeometry height="82" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_presenca" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Confirmar presença (EM_ESPERA)" vertex="1">
-          <mxGeometry height="58" width="210" x="1135" y="1081" as="geometry" />
+        <mxCell id="T_CONVENIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="CONVENIOS" vertex="1">
+          <mxGeometry height="80" width="220" x="1080" y="528" as="geometry" />
         </mxCell>
-        <mxCell id="at1_fila" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Colocar na fila e notificar o paciente" vertex="1">
-          <mxGeometry height="58" width="210" x="655" y="1181" as="geometry" />
+        <mxCell id="T_CONVENIOS_c" parent="T_CONVENIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;nome (UNIQUE)&lt;br&gt;registro_ans" vertex="1">
+          <mxGeometry height="54" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_chamar" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Chamar o paciente (EM_ATENDIMENTO)" vertex="1">
-          <mxGeometry height="58" width="210" x="1615" y="1281" as="geometry" />
+        <mxCell id="T_DISPONIBILIDADES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="DISPONIBILIDADES" vertex="1">
+          <mxGeometry height="122" width="220" x="300" y="716" as="geometry" />
         </mxCell>
-        <mxCell id="at1_pront" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar anotações e prontuário" vertex="1">
-          <mxGeometry height="58" width="210" x="1615" y="1381" as="geometry" />
+        <mxCell id="T_DISPONIBILIDADES_c" parent="T_DISPONIBILIDADES" style="text;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;medico_id (FK)&lt;br&gt;dia_semana&lt;br&gt;hora_inicio&lt;br&gt;hora_fim&lt;br&gt;duracao_min" vertex="1">
+          <mxGeometry height="96" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_dReceita" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Precisa de receita ou atestado?" vertex="1">
-          <mxGeometry height="74" width="150" x="1645" y="1473" as="geometry" />
+        <mxCell id="T_CONSULTAS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="CONSULTAS" vertex="1">
+          <mxGeometry height="248" width="220" x="560" y="716" as="geometry" />
         </mxCell>
-        <mxCell id="at1_receita" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Emitir receita ou atestado" vertex="1">
-          <mxGeometry height="58" width="210" x="1736" y="1581" as="geometry" />
+        <mxCell id="T_CONSULTAS_c" parent="T_CONSULTAS" style="text;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fillColor=#f5f5f5;strokeColor=default;fontColor=#333333;fillStyle=auto;labelBackgroundColor=none;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK)&lt;br&gt;medico_id (FK)&lt;br&gt;data_hora&lt;br&gt;tipo (NORMAL | ENCAIXE | RETORNO)&lt;br&gt;status (AGENDADA | CONFIRMADA | EM_ESPERA | EM_ATENDIMENTO | FINALIZADA | CANCELADA | FALTOU)&lt;br&gt;check_in_em&lt;br&gt;atraso_min&lt;br&gt;anotacoes&lt;br&gt;motivo_cancelamento&lt;br&gt;iniciada_em&lt;br&gt;finalizada_em&lt;br&gt;criado_em" vertex="1">
+          <mxGeometry height="222" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_m1" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE7D6;strokeColor=#C8824A;" value="" vertex="1">
-          <mxGeometry height="44" width="44" x="1698" y="1688" as="geometry" />
+        <mxCell id="T_PRONTUARIOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="PRONTUARIOS" vertex="1">
+          <mxGeometry height="94" width="220" x="820" y="716" as="geometry" />
         </mxCell>
-        <mxCell id="at1_dExame" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Precisa de exame?" vertex="1">
-          <mxGeometry height="74" width="150" x="1645" y="1773" as="geometry" />
+        <mxCell id="T_PRONTUARIOS_c" parent="T_PRONTUARIOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;paciente_id (FK, UNIQUE)&lt;br&gt;alergias&lt;br&gt;observacoes" vertex="1">
+          <mxGeometry height="68" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_exame" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Solicitar exame e definir prazo de retorno" vertex="1">
-          <mxGeometry height="58" width="210" x="1736" y="1881" as="geometry" />
+        <mxCell id="T_DOCUMENTOS_MEDICOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="DOCUMENTOS_MEDICOS" vertex="1">
+          <mxGeometry height="150" width="220" x="1080" y="716" as="geometry" />
         </mxCell>
-        <mxCell id="at1_m2" parent="at1_1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE7D6;strokeColor=#C8824A;" value="" vertex="1">
-          <mxGeometry height="44" width="44" x="1698" y="1988" as="geometry" />
+        <mxCell id="T_DOCUMENTOS_MEDICOS_c" parent="T_DOCUMENTOS_MEDICOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;prontuario_id (FK)&lt;br&gt;consulta_id (FK, NULL)&lt;br&gt;medico_id (FK, NULL)&lt;br&gt;tipo (RECEITA | ATESTADO)&lt;br&gt;conteudo&lt;br&gt;data_emissao&lt;br&gt;data_retirada" vertex="1">
+          <mxGeometry height="124" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_finaliza" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Finalizar o atendimento (FINALIZADA)" vertex="1">
-          <mxGeometry height="58" width="210" x="1615" y="2081" as="geometry" />
+        <mxCell id="T_BOLETOS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="BOLETOS" vertex="1">
+          <mxGeometry height="136" width="220" x="560" y="1044" as="geometry" />
         </mxCell>
-        <mxCell id="at1_boleto" parent="at1_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Gerar o boleto (retorno: R$ 0,00, já pago)" vertex="1">
-          <mxGeometry height="58" width="210" x="655" y="2181" as="geometry" />
+        <mxCell id="T_BOLETOS_c" parent="T_BOLETOS" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;consulta_id (FK, UNIQUE)&lt;br&gt;convenio_id (FK, NULL)&lt;br&gt;valor&lt;br&gt;vencimento&lt;br&gt;status (PENDENTE | PAGO | CANCELADO)" vertex="1">
+          <mxGeometry height="110" width="220" y="26" as="geometry" />
         </mxCell>
-        <mxCell id="at1_fim" parent="at1_1" style="ellipse;html=1;shape=endState;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="34" width="34" x="743" y="2293" as="geometry" />
+        <mxCell id="T_EXAMES" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#E1D5E7;strokeColor=#9673A6;swimlaneFillColor=#E1D5E7;fontFamily=Helvetica;" value="EXAMES" vertex="1">
+          <mxGeometry height="192" width="220" x="820" y="1044" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s0" edge="1" parent="at1_1" source="at1_ini" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_esc" value="">
+        <mxCell id="T_EXAMES_c" parent="T_EXAMES" style="text;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontColor=#333333;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;prontuario_id (FK)&lt;br&gt;consulta_id (FK)&lt;br&gt;tipo&lt;br&gt;status (SOLICITADO | COLETADO | CONCLUIDO)&lt;br&gt;data_solicitacao&lt;br&gt;data_resultado&lt;br&gt;arquivo_resultado&lt;br&gt;arquivo_nome&lt;br&gt;prazo_retorno_dias" vertex="1">
+          <mxGeometry height="166" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="T_STORAGE_OBJECTS" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;fontSize=11;fillColor=#F5F5F5;strokeColor=#999999;swimlaneFillColor=#F5F5F5;dashed=1;fontFamily=Helvetica;" value="STORAGE.OBJECTS &lt;span style=&quot;&quot;&gt;(Supabase)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="80" width="220" x="1080" y="1044" as="geometry" />
+        </mxCell>
+        <mxCell id="T_STORAGE_OBJECTS_c" parent="T_STORAGE_OBJECTS" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;whiteSpace=wrap;html=1;fontSize=11;overflow=hidden;fontFamily=Helvetica;fontStyle=0" value="id (PK)&lt;br&gt;bucket_id (resultados-exames)&lt;br&gt;name" vertex="1">
+          <mxGeometry height="54" width="220" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="r0" edge="1" parent="1" source="T_USUARIOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_AUTH_USERS" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s1" edge="1" parent="at1_1" source="at1_esc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_dLivre" value="">
+        <mxCell id="r1" edge="1" parent="1" source="T_NOTIFICACOES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s2" edge="1" parent="at1_1" source="at1_dLivre" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_reg" value="[sim]">
+        <mxCell id="r2" edge="1" parent="1" source="T_LOG_ALTERACOES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s3" edge="1" parent="at1_1" source="at1_dLivre" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_espera" value="[não]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="280" y="410" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s4" edge="1" parent="at1_1" source="at1_espera" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_vaga" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="159" y="510" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s5" edge="1" parent="at1_1" source="at1_vaga" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_esc" value="[vaga disponível]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="639" y="210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s6" edge="1" parent="at1_1" source="at1_reg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_dVai" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="760" y="610" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s7" edge="1" parent="at1_1" source="at1_dVai" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#FFFFFF;" value="[não]">
-          <mxGeometry relative="1" x="-0.7204" y="10" as="geometry">
-            <mxPoint as="offset" />
-            <Array as="points">
-              <mxPoint x="280" y="660" />
-              <mxPoint x="220" y="660" />
-            </Array>
-            <mxPoint x="220" y="680" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s8" edge="1" parent="at1_1" source="at1_cancela" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_cancelaS" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="502" y="710" />
-              <mxPoint x="502" y="810" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s9" edge="1" parent="at1_1" source="at1_cancelaS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_fimC" value="">
+        <mxCell id="r3" edge="1" parent="1" source="T_LISTA_ESPERA" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_ESPECIALIDADES" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s10" edge="1" parent="at1_1" source="at1_dVai" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_checkin" value="[sim]">
-          <mxGeometry relative="1" x="0.5373" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s11" edge="1" parent="at1_1" source="at1_checkin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_dChegou" value="">
-          <mxGeometry relative="1" x="0.0398" as="geometry">
-            <Array as="points">
-              <mxPoint x="280" y="947" />
-              <mxPoint x="1080" y="947" />
-              <mxPoint x="1080" y="910" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s12" edge="1" parent="at1_1" source="at1_dChegou" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_falta" value="[não]">
+        <mxCell id="r4" edge="1" parent="1" source="T_LISTA_ESPERA" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1361" y="910" />
+              <mxPoint x="410" y="498" />
+              <mxPoint x="930" y="498" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="at1_s13" edge="1" parent="at1_1" source="at1_falta" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_fimF" value="">
+        <mxCell id="r5" edge="1" parent="1" source="T_MEDICO_ESPECIALIDADE" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_ESPECIALIDADES" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s14" edge="1" parent="at1_1" source="at1_dChegou" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_presenca" value="[sim]">
+        <mxCell id="r6" edge="1" parent="1" source="T_MEDICO_ESPECIALIDADE" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERoneToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s15" edge="1" parent="at1_1" source="at1_presenca" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_fila" value="">
+        <mxCell id="r7" edge="1" parent="1" source="T_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" edge="1" parent="1" source="T_PACIENTES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_USUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" edge="1" parent="1" source="T_PACIENTES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONVENIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r10" edge="1" parent="1" source="T_DISPONIBILIDADES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r11" edge="1" parent="1" source="T_CONSULTAS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r12" edge="1" parent="1" source="T_CONSULTAS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r13" edge="1" parent="1" source="T_PRONTUARIOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERmandOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PACIENTES" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r14" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PRONTUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r15" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="982" y="1110" />
-              <mxPoint x="982" y="1210" />
+              <mxPoint x="1190" y="1004" />
+              <mxPoint x="747" y="1004" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="at1_s16" edge="1" parent="at1_1" source="at1_fila" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_chamar" value="[médico livre]">
+        <mxCell id="r16" edge="1" parent="1" source="T_DOCUMENTOS_MEDICOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_MEDICOS" value="">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="760" y="1310" />
+              <mxPoint x="1190" y="688" />
+              <mxPoint x="487" y="688" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="at1_s17" edge="1" parent="at1_1" source="at1_chamar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_pront" value="">
+        <mxCell id="r17" edge="1" parent="1" source="T_BOLETOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToOne;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s18" edge="1" parent="at1_1" source="at1_pront" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_dReceita" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at1_s19" edge="1" parent="at1_1" source="at1_dReceita" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#FFFFFF;" value="[sim]">
-          <mxGeometry relative="1" x="-0.165" y="10" as="geometry">
-            <mxPoint as="offset" />
+        <mxCell id="r18" edge="1" parent="1" source="T_BOLETOS" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=10;endSize=10;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONVENIOS" value="">
+          <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1720" y="1560" />
-              <mxPoint x="1790" y="1560" />
+              <mxPoint x="670" y="1276" />
+              <mxPoint x="1340" y="1276" />
+              <mxPoint x="1340" y="568" />
             </Array>
-            <mxPoint x="1790" y="1580" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="at1_s20" edge="1" parent="at1_1" source="at1_dReceita" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_m1" value="[não]">
-          <mxGeometry relative="1" x="0.6028" as="geometry">
+        <mxCell id="r19" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_PRONTUARIOS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r20" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;startArrow=ERzeroToMany;endArrow=ERmandOne;startFill=0;endFill=0;startSize=10;endSize=10;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_CONSULTAS" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r21" edge="1" parent="1" source="T_EXAMES" style="html=1;rounded=0;strokeColor=#666666;dashed=1;endArrow=open;endFill=0;startArrow=none;labelBackgroundColor=#FFFFFF;fontSize=10;fontFamily=Helvetica;fontStyle=0" target="T_STORAGE_OBJECTS" value="arquivo do resultado">
+          <mxGeometry relative="1" x="-0.2882" y="-27" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="at1_s21" edge="1" parent="at1_1" source="at1_receita" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_m1" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1841" y="1710" />
-            </Array>
-          </mxGeometry>
+        <mxCell id="nota" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=6;fontSize=10;fillColor=#FFF2CC;strokeColor=#D6B656;fontFamily=Helvetica;fontStyle=0" value="Recepcionista, administrador, financeiro, laboratório e farmácia não têm tabela própria: o perfil fica em USUARIOS.tipo. A senha fica no Supabase Auth (AUTH.USERS)." vertex="1">
+          <mxGeometry height="92" width="220" x="40" y="716" as="geometry" />
         </mxCell>
-        <mxCell id="at1_s22" edge="1" parent="at1_1" source="at1_m1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_dExame" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at1_s23" edge="1" parent="at1_1" source="at1_dExame" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#FFFFFF;" value="[sim]">
-          <mxGeometry relative="1" x="0.3496" y="10" as="geometry">
-            <mxPoint as="offset" />
-            <Array as="points">
-              <mxPoint x="1720" y="1860" />
-              <mxPoint x="1810" y="1860" />
-            </Array>
-            <mxPoint x="1810" y="1880" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s24" edge="1" parent="at1_1" source="at1_dExame" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_m2" value="[não]">
-          <mxGeometry relative="1" x="0.6028" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s25" edge="1" parent="at1_1" source="at1_exame" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_m2" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1841" y="2010" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s26" edge="1" parent="at1_1" source="at1_m2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_finaliza" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at1_s27" edge="1" parent="at1_1" source="at1_finaliza" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_boleto" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="982" y="2110" />
-              <mxPoint x="982" y="2210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at1_s28" edge="1" parent="at1_1" source="at1_boleto" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at1_fim" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at1_nota" parent="at1_1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=8;fontSize=12;fillColor=#FFFDE7;strokeColor=#C8B84A;" value="O paciente pode fazer o check-in pelo celular; se não fizer, a recepção confirma a presença direto. O médico só chama o próximo paciente depois de finalizar o atendimento em andamento. O que acontece depois (exame, retorno, receita e pagamento) está na aba &quot;Após o atendimento&quot;." vertex="1">
-          <mxGeometry height="70" width="900" x="40" y="2417" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-  <diagram name="Após o atendimento" id="Qz-iCOLQiDGIINBEsb4S">
-    <mxGraphModel dx="3233" dy="1508" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1780" pageHeight="1577" math="0" shadow="0">
-      <root>
-        <mxCell id="at2_0" />
-        <mxCell id="at2_1" parent="at2_0" />
-        <mxCell id="at2_raia0" parent="at2_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Paciente" vertex="1">
-          <mxGeometry height="1377" width="340" x="40" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_raia1" parent="at2_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Sistema" vertex="1">
-          <mxGeometry height="1377" width="340" x="380" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_raia2" parent="at2_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Laboratório" vertex="1">
-          <mxGeometry height="1377" width="340" x="720" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_raia3" parent="at2_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Farmácia" vertex="1">
-          <mxGeometry height="1377" width="340" x="1060" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_raia4" parent="at2_1" style="swimlane;html=1;startSize=40;fontStyle=1;fontSize=14;fillColor=#F4F2FB;strokeColor=#4A4566;swimlaneFillColor=#FFFFFF;" value="Financeiro" vertex="1">
-          <mxGeometry height="1377" width="340" x="1400" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_ini" parent="at2_1" style="ellipse;html=1;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="30" width="30" x="535" y="95" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_fork" parent="at2_1" style="rounded=0;html=1;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="8" width="300" x="400" y="206" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_dExame" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Exame solicitado?" vertex="1">
-          <mxGeometry height="74" width="150" x="135" y="273" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_vaiLab" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Ir ao laboratório" vertex="1">
-          <mxGeometry height="58" width="210" x="105" y="381" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_coleta" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar a coleta (COLETADO)" vertex="1">
-          <mxGeometry height="58" width="210" x="785" y="481" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_resultado" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Anexar o resultado (CONCLUIDO)" vertex="1">
-          <mxGeometry height="58" width="210" x="785" y="581" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_notifica" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Notificar o paciente e o médico" vertex="1">
-          <mxGeometry height="58" width="210" x="445" y="681" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_dPrazo" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Há prazo de retorno?" vertex="1">
-          <mxGeometry height="74" width="150" x="135" y="773" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_retorno" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Agendar o retorno dentro do prazo" vertex="1">
-          <mxGeometry height="58" width="210" x="105" y="881" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_regRet" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar a consulta de retorno (AGENDADA)" vertex="1">
-          <mxGeometry height="58" width="210" x="445" y="981" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_mE" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE7D6;strokeColor=#C8824A;" value="" vertex="1">
-          <mxGeometry height="44" width="44" x="528" y="1088" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_dReceita" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Recebeu receita?" vertex="1">
-          <mxGeometry height="74" width="150" x="1155" y="273" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_busca" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Buscar as receitas pelo CPF do paciente" vertex="1">
-          <mxGeometry height="58" width="210" x="1125" y="381" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_retira" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Registrar a retirada do medicamento" vertex="1">
-          <mxGeometry height="58" width="210" x="1125" y="481" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_mR" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE7D6;strokeColor=#C8824A;" value="" vertex="1">
-          <mxGeometry height="44" width="44" x="1208" y="588" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_dBoleto" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FDE7D6;strokeColor=#C8824A;" value="Boleto pendente?" vertex="1">
-          <mxGeometry height="74" width="150" x="1495" y="273" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_baixa" parent="at2_1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fontSize=12;fillColor=#DCD3F7;strokeColor=#6E51D8;" value="Receber o pagamento e dar baixa (PAGO)" vertex="1">
-          <mxGeometry height="58" width="210" x="1465" y="381" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_mB" parent="at2_1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE7D6;strokeColor=#C8824A;" value="" vertex="1">
-          <mxGeometry height="44" width="44" x="1548" y="488" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_join" parent="at2_1" style="rounded=0;html=1;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="8" width="300" x="400" y="1206" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_fim" parent="at2_1" style="ellipse;html=1;shape=endState;fillColor=#1E1B2E;strokeColor=#1E1B2E;" value="" vertex="1">
-          <mxGeometry height="34" width="34" x="533" y="1293" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s0" edge="1" parent="at2_1" source="at2_ini" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_fork" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s1" edge="1" parent="at2_1" source="at2_fork" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_dExame" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="210" y="210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s2" edge="1" parent="at2_1" source="at2_fork" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_dReceita" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1230" y="210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s3" edge="1" parent="at2_1" source="at2_fork" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_dBoleto" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1570" y="210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s4" edge="1" parent="at2_1" source="at2_dExame" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_vaiLab" value="[sim]">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s5" edge="1" parent="at2_1" source="at2_vaiLab" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_coleta" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="362" y="410" />
-              <mxPoint x="362" y="510" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s6" edge="1" parent="at2_1" source="at2_coleta" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_resultado" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s7" edge="1" parent="at2_1" source="at2_resultado" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_notifica" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="702" y="610" />
-              <mxPoint x="702" y="710" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s8" edge="1" parent="at2_1" source="at2_notifica" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_dPrazo" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="210" y="710" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s9" edge="1" parent="at2_1" source="at2_dPrazo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_retorno" value="[sim]">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s10" edge="1" parent="at2_1" source="at2_retorno" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_regRet" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="362" y="910" />
-              <mxPoint x="362" y="1010" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s11" edge="1" parent="at2_1" source="at2_regRet" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mE" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s12" edge="1" parent="at2_1" source="at2_dPrazo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mE" value="[não]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="362" y="810" />
-              <mxPoint x="362" y="1110" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s13" edge="1" parent="at2_1" source="at2_dExame" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mE" value="[não]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="58" y="310" />
-              <mxPoint x="58" y="1110" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s14" edge="1" parent="at2_1" source="at2_dReceita" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_busca" value="[sim]">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s15" edge="1" parent="at2_1" source="at2_busca" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_retira" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s16" edge="1" parent="at2_1" source="at2_retira" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mR" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s17" edge="1" parent="at2_1" source="at2_dReceita" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mR" value="[não]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1078" y="310" />
-              <mxPoint x="1078" y="610" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s18" edge="1" parent="at2_1" source="at2_dBoleto" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_baixa" value="[sim]">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s19" edge="1" parent="at2_1" source="at2_baixa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mB" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s20" edge="1" parent="at2_1" source="at2_dBoleto" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_mB" value="[não]">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1418" y="310" />
-              <mxPoint x="1418" y="510" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s21" edge="1" parent="at2_1" source="at2_mE" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_join" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_s22" edge="1" parent="at2_1" source="at2_mR" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_join" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1230" y="1210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s23" edge="1" parent="at2_1" source="at2_mB" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_join" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1570" y="1210" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="at2_s24" edge="1" parent="at2_1" source="at2_join" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;endSize=10;fontSize=11;strokeColor=#4A4566;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#FFFFFF;" target="at2_fim" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="at2_nota" parent="at2_1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=8;fontSize=12;fillColor=#FFFDE7;strokeColor=#C8B84A;" value="Começa quando o atendimento é finalizado (aba &quot;Do agendamento ao atendimento&quot;). Os três caminhos acontecem em paralelo: exame e retorno, receita e pagamento. A consulta de retorno segue de novo o fluxo da primeira aba, a partir do check-in." vertex="1">
-          <mxGeometry height="70" width="900" x="40" y="1417" as="geometry" />
+        <mxCell id="regras" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fillColor=#FFF2CC;strokeColor=#D6B656;fontFamily=Helvetica;fontStyle=0" value="&lt;span&gt;Regras garantidas pelo banco&lt;/span&gt;&lt;br&gt;• CONSULTAS: sem dois agendamentos no mesmo horário do médico (exceto encaixe) ou do paciente; um médico com no máximo uma consulta EM_ATENDIMENTO; o status só avança pelas etapas previstas.&lt;br&gt;• DISPONIBILIDADES: horários do mesmo médico não se sobrepõem. • LISTA_ESPERA: uma solicitação ativa por paciente e especialidade.&lt;br&gt;• LOG_ALTERACOES não pode ser alterado nem apagado. • Regras de acesso (RLS) em todas as tabelas.&lt;br&gt;&lt;span&gt;Legenda:&lt;/span&gt; PK chave primária · FK chave estrangeira · UNIQUE valor único · NULL chave opcional · linha tracejada: referência ao arquivo no Storage (não é FK)." vertex="1">
+          <mxGeometry height="110" width="1260" x="40" y="1316" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
