@@ -94,7 +94,7 @@ export function Atendimento() {
       <header className="paciente-cabecalho">
         <div>
           <h1>{c.paciente_nome}</h1>
-          {h && (
+          {h?.paciente && (
             <p className="texto-suave">
               {idade(h.paciente.data_nascimento)} anos, {h.paciente.convenio_nome ? `convênio ${h.paciente.convenio_nome}` : 'particular'}. {TIPO[c.tipo]} marcada para {dataHora(c.data_hora)}.
             </p>

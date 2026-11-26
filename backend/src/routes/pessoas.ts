@@ -134,16 +134,19 @@ pessoasRouter.get('/pacientes/:id/historico', async (req, res) => {
   const medico = u.tipo === 'MEDICO' && (await medicoAtendePaciente(u.id, id));
   if (!(medico || (u.tipo === 'PACIENTE' && u.id === id))) throw new HttpError(403, 'Acesso não autorizado ao histórico clínico.');
 
-  const [consultasRows, prontuario] = await Promise.all([
+  const [consultasRows, prontuario, pacienteRow] = await Promise.all([
     q<ConsultaLinha[]>(supabase.from('consultas').select('*').eq('paciente_id', id).order('data_hora', { ascending: false }).limit(200)),
     prontuarioDe(id),
+    q<any>(supabase.from('pacientes').select('*').eq('usuario_id', id).maybeSingle()),
   ]);
+  if (!pacienteRow) throw new HttpError(404, 'Paciente não encontrado.');
+  const paciente = (await montarPacientes([pacienteRow]))[0];
   const consultas = (await enriquecerConsultas(consultasRows)).map((c) => {
     const base = { id: c.id, data_hora: c.data_hora, tipo: c.tipo, status: c.status, medico_id: c.medico_id, medico_nome: c.medico_nome, especialidades: c.especialidades, motivo_cancelamento: c.motivo_cancelamento };
     return medico ? { ...base, anotacoes: c.anotacoes } : base; // anotação clínica não aparece para o paciente
   });
   const [exames, documentos] = await Promise.all([listarExames({ prontuario_id: prontuario.id }), listarDocumentos({ prontuario_id: prontuario.id })]);
-  res.json({ prontuario, consultas, exames, documentos });
+  res.json({ paciente, prontuario, consultas, exames, documentos });
 });
 
 pessoasRouter.put('/pacientes/:id/prontuario', permitir('MEDICO'), async (req, res) => {
