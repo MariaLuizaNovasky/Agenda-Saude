@@ -26,7 +26,7 @@ A solução acompanha a jornada do paciente desde o agendamento até o retorno, 
 
 - **Frontend:** React, TypeScript, Vite e React Router.
 - **Backend:** Node.js, Express e TypeScript.
-- **Banco de dados:** PostgreSQL e Supabase (veja a [configuração](backend/supabase/README.md)).
+- **Banco de dados:** PostgreSQL e Supabase;
 - **Tempo real:** Server-Sent Events (SSE).
 - **Modelagem:** UML e diagrams.net (Draw.io).
 
@@ -44,8 +44,6 @@ As imagens SVG são representações geradas a partir dos arquivos Draw.io versi
 
 ![Casos de uso — gestão](docs/imagens/casos-de-uso-gestao.svg)
 
-[Arquivo editável](Diagrama_casos_uso.drawio)
-
 ### Diagrama de atividades
 
 **Do agendamento ao atendimento**
@@ -56,19 +54,15 @@ As imagens SVG são representações geradas a partir dos arquivos Draw.io versi
 
 ![Atividades — após o atendimento](docs/imagens/atividades-pos-atendimento.svg)
 
-[Arquivo editável](Diagrama_atividades.drawio)
 
 ### Diagrama de classes
 
 ![Diagrama de classes](docs/imagens/classes.svg)
 
-[Arquivo editável](Diagrama%20de%20classes%20.drawio)
-
 ### Diagrama do banco de dados
 
 ![Diagrama do banco de dados](docs/imagens/banco-de-dados.svg)
 
-[Arquivo editável](Diagrama%20BD.drawio)
 
 ## Executar localmente
 
@@ -81,11 +75,6 @@ npm install
 npm run dev
 ```
 
-Configure as variáveis de ambiente conforme a documentação do projeto antes de iniciar, quando necessário.
-
-- Frontend: http://localhost:5173
-- API: http://localhost:3333/api
-
 ## Estrutura do projeto
 
 ```text
@@ -95,7 +84,3 @@ Agenda-Saude/
 ├── docs/imagens/   Imagens da documentação
 └── README.md
 ```
-
-Para mais detalhes, consulte a documentação do [frontend](frontend/README.md) e do [backend](backend/README.md).
-
-Não publique credenciais nem informações clínicas ou pessoais reais no repositório.
