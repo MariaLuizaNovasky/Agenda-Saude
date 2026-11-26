@@ -115,7 +115,11 @@ describe('médico', () => {
     expect((await get(EMAILS.helena, `/api/pacientes/${novo.body.id}/historico`)).status).toBe(403);
 
     const ana = (await entrar(EMAILS.ana)).id; // Ana tem consulta com a Helena
-    expect((await get(EMAILS.helena, `/api/pacientes/${ana}/historico`)).status).toBe(200);
+    const historico = await get(EMAILS.helena, `/api/pacientes/${ana}/historico`);
+    expect(historico.status).toBe(200);
+    expect(historico.body.paciente).toMatchObject({ id: ana });
+    expect(historico.body.paciente.nome).toBeTruthy();
+    expect(historico.body.prontuario).toBeTruthy();
   });
 
   it('só enxerga as próprias consultas e a própria fila', async () => {

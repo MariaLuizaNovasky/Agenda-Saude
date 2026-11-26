@@ -8,7 +8,7 @@ import { useAgora, useCarregar, useEventos } from '../hooks';
 import { STATUS_EXAME, TOM_EXAME } from './Historico';
 
 interface Historico {
-  paciente: { id: number; nome: string; telefone: string; cpf: string; data_nascimento: string; convenio_nome: string | null; numero_carteirinha: string | null };
+  paciente: { id: string; nome: string; telefone: string | null; cpf: string; data_nascimento: string; convenio_nome: string | null; numero_carteirinha: string | null };
   prontuario: { id: number; alergias: string | null; observacoes: string | null };
   consultas: { id: number; data_hora: string; tipo: TipoConsulta; status: StatusConsulta; anotacoes: string | null; medico_nome: string }[];
   exames: Exame[];
